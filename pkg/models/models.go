@@ -1,6 +1,8 @@
 package models
 
 type Muscle struct {
-	Name    string
-	IsFront bool
+	Id         int
+	Name       string
+	SimpleName string
+	IsFront    bool
 }

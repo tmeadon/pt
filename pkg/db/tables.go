@@ -12,7 +12,7 @@ var tables = tableMap{
 
 const dropTableString string = "DROP TABLE IF EXISTS %s;"
 
-func recreateMusclesTable() error {
+func RecreateMusclesTable() error {
 	err := dropTable(tables.musclesTable)
 	if err != nil {
 		return err
@@ -22,6 +22,7 @@ func recreateMusclesTable() error {
     CREATE TABLE IF NOT EXISTS %s (
       id INTEGER NOT NULL PRIMARY KEY,
       name TEXT NOT NULL,
+      simple_name TEXT NOT NULL,
       is_front BOOLEAN
     );`
 	_, err = DB.Exec(fmt.Sprintf(createTable, tables.musclesTable))
