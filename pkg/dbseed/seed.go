@@ -30,3 +30,26 @@ func SeedMusclesFromWger() error {
 
 	return nil
 }
+
+func SeedEquipmentFromWger() error {
+	err := db.RecreateEquipmentTable()
+	if err != nil {
+		return err
+	}
+
+	equipment, err := wger.GetAllEquipment()
+	if err != nil {
+		return err
+	}
+
+	for i := 0; i < len(equipment); i++ {
+		err = db.InsertEquipment(models.Equipment{
+			Name: equipment[i].Name,
+		})
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}

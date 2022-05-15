@@ -6,3 +6,8 @@ type Muscle struct {
 	SimpleName string
 	IsFront    bool
 }
+
+type Equipment struct {
+	Id   int
+	Name string
+}
