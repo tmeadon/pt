@@ -1,5 +1,13 @@
 module github.com/tmeadon/pt
 
-go 1.17
+go 1.18
 
-require github.com/mattn/go-sqlite3 v1.14.13 // indirect
+require github.com/mattn/go-sqlite3 v1.14.13
+
+require (
+	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.0.0 // indirect
+	github.com/Azure/azure-sdk-for-go/sdk/internal v1.0.0 // indirect
+	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v0.4.1 // indirect
+	golang.org/x/net v0.0.0-20220425223048-2871e0cb64e4 // indirect
+	golang.org/x/text v0.3.7 // indirect
+)
