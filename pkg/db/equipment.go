@@ -7,25 +7,41 @@ import (
 	"github.com/tmeadon/pt/pkg/models"
 )
 
-func InsertEquipment(newEquipment models.Equipment) error {
+func InsertEquipment(newEquipment models.Equipment, keepID bool) error {
 	tx, err := DB.Begin()
 	if err != nil {
 		return err
 	}
 
-	stmt, err := tx.Prepare(fmt.Sprintf("INSERT INTO %s (name) VALUES (?)", tables.equipmentTable))
+	stmt, err := tx.Prepare(getEquipmentInsertStatement(keepID))
 	if err != nil {
 		return err
 	}
 
 	defer stmt.Close()
 
-	_, err = stmt.Exec(newEquipment.Name)
+	err = execEquipmentInsert(stmt, &newEquipment, keepID)
 	if err != nil {
 		return err
 	}
 
 	err = tx.Commit()
+	return err
+}
+
+func getEquipmentInsertStatement(keepID bool) string {
+	if keepID {
+		return fmt.Sprintf("INSERT INTO %s (id, name) VALUES (?, ?)", tables.equipmentTable)
+	}
+	return fmt.Sprintf("INSERT INTO %s (name) VALUES (?)", tables.equipmentTable)
+}
+
+func execEquipmentInsert(stmt *sql.Stmt, newEquip *models.Equipment, keepID bool) error {
+	if keepID {
+		_, err := stmt.Exec(newEquip.Id, newEquip.Name)
+		return err
+	}
+	_, err := stmt.Exec(newEquip.Name)
 	return err
 }
 

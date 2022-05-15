@@ -6,7 +6,21 @@ import (
 	"github.com/tmeadon/pt/pkg/wger"
 )
 
-func SeedMusclesFromWger() error {
+func SeedFromWger() error {
+	err := seedMusclesFromWger()
+	if err != nil {
+		return err
+	}
+
+	err = seedEquipmentFromWger()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func seedMusclesFromWger() error {
 	err := db.RecreateMusclesTable()
 	if err != nil {
 		return err
@@ -18,11 +32,13 @@ func SeedMusclesFromWger() error {
 	}
 
 	for i := 0; i < len(muscles); i++ {
-		err = db.InsertMuscle(models.Muscle{
+		muscle := models.Muscle{
+			Id:         muscles[i].Id,
 			Name:       muscles[i].Name,
 			SimpleName: muscles[i].SimpleName,
 			IsFront:    muscles[i].IsFront,
-		})
+		}
+		err = db.InsertMuscle(muscle, true)
 		if err != nil {
 			return err
 		}
@@ -31,7 +47,7 @@ func SeedMusclesFromWger() error {
 	return nil
 }
 
-func SeedEquipmentFromWger() error {
+func seedEquipmentFromWger() error {
 	err := db.RecreateEquipmentTable()
 	if err != nil {
 		return err
@@ -43,9 +59,11 @@ func SeedEquipmentFromWger() error {
 	}
 
 	for i := 0; i < len(equipment); i++ {
-		err = db.InsertEquipment(models.Equipment{
+		e := models.Equipment{
+			Id:   equipment[i].Id,
 			Name: equipment[i].Name,
-		})
+		}
+		err = db.InsertEquipment(e, true)
 		if err != nil {
 			return err
 		}

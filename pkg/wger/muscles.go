@@ -5,6 +5,7 @@ import (
 )
 
 type Muscle struct {
+	Id         int    `json:"id"`
 	Name       string `json:"name"`
 	SimpleName string `json:"name_en"`
 	IsFront    bool   `json:"is_front"`
