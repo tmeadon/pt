@@ -31,9 +31,9 @@ func InsertEquipment(newEquipment models.Equipment, keepID bool) error {
 
 func getEquipmentInsertStatement(keepID bool) string {
 	if keepID {
-		return fmt.Sprintf("INSERT INTO %s (id, name) VALUES (?, ?)", tables.equipmentTable)
+		return fmt.Sprintf("INSERT INTO %s (id, name) VALUES (?, ?)", tables.EquipmentTable)
 	}
-	return fmt.Sprintf("INSERT INTO %s (name) VALUES (?)", tables.equipmentTable)
+	return fmt.Sprintf("INSERT INTO %s (name) VALUES (?)", tables.EquipmentTable)
 }
 
 func execEquipmentInsert(stmt *sql.Stmt, newEquip *models.Equipment, keepID bool) error {
@@ -48,7 +48,7 @@ func execEquipmentInsert(stmt *sql.Stmt, newEquip *models.Equipment, keepID bool
 func GetAllEquipment() ([]models.Equipment, error) {
 	equipment := make([]models.Equipment, 0)
 
-	stmt, err := DB.Prepare(fmt.Sprintf("SELECT id, name, full_name, is_front from %s", tables.equipmentTable))
+	stmt, err := DB.Prepare(fmt.Sprintf("SELECT id, name, full_name, is_front from %s", tables.EquipmentTable))
 	if err != nil {
 		return []models.Equipment{}, err
 	}

@@ -31,9 +31,9 @@ func InsertMuscle(newMuscle models.Muscle, keepID bool) error {
 
 func getMuscleInsertStatement(keepID bool) string {
 	if keepID {
-		return fmt.Sprintf("INSERT INTO %s (id, name, simple_name, is_front) VALUES (?, ?, ?, ?)", tables.musclesTable)
+		return fmt.Sprintf("INSERT INTO %s (id, name, simple_name, is_front) VALUES (?, ?, ?, ?)", tables.MusclesTable)
 	}
-	return fmt.Sprintf("INSERT INTO %s (name, simple_name, is_front) VALUES (?, ?, ?)", tables.musclesTable)
+	return fmt.Sprintf("INSERT INTO %s (name, simple_name, is_front) VALUES (?, ?, ?)", tables.MusclesTable)
 }
 
 func execMuscleInsert(stmt *sql.Stmt, newMuscle *models.Muscle, keepID bool) error {
@@ -48,7 +48,7 @@ func execMuscleInsert(stmt *sql.Stmt, newMuscle *models.Muscle, keepID bool) err
 func GetAllMuscles() ([]models.Muscle, error) {
 	muscles := make([]models.Muscle, 0)
 
-	stmt, err := DB.Prepare(fmt.Sprintf("SELECT id, name, full_name, is_front from %s", tables.musclesTable))
+	stmt, err := DB.Prepare(fmt.Sprintf("SELECT id, name, full_name, is_front from %s", tables.MusclesTable))
 	if err != nil {
 		return []models.Muscle{}, err
 	}
