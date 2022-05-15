@@ -8,10 +8,11 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-var dbPath string = "./pt.db"
 var DB *sql.DB
+var dbPath string
 
-func ConnectDatabase() error {
+func ConnectDatabase(path string) error {
+	dbPath = path
 	ensureDbExists(dbPath)
 
 	db, err := sql.Open("sqlite3", dbPath)
@@ -30,8 +31,4 @@ func ensureDbExists(path string) error {
 		return err
 	}
 	return nil
-}
-
-func Init() error {
-	return createMusclesTable()
 }

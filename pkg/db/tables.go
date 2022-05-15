@@ -1,13 +1,35 @@
 package db
 
-const musclesTableCreate string = `
-  CREATE TABLE IF NOT EXISTS muscles (
-  id INTEGER NOT NULL PRIMARY KEY,
-  name TEXT NOT NULL,
-  isFront BOOLEAN
-);`
+import "fmt"
 
-func createMusclesTable() error {
-	_, err := DB.Exec(musclesTableCreate)
+type tableMap struct {
+	musclesTable string
+}
+
+var tables = tableMap{
+	musclesTable: "muscles",
+}
+
+const dropTableString string = "DROP TABLE IF EXISTS %s;"
+
+func recreateMusclesTable() error {
+	err := dropTable(tables.musclesTable)
+	if err != nil {
+		return err
+	}
+
+	createTable := `
+    CREATE TABLE IF NOT EXISTS %s (
+      id INTEGER NOT NULL PRIMARY KEY,
+      name TEXT NOT NULL,
+      is_front BOOLEAN
+    );`
+	_, err = DB.Exec(fmt.Sprintf(createTable, tables.musclesTable))
+
+	return err
+}
+
+func dropTable(table string) error {
+	_, err := DB.Exec(fmt.Sprintf(dropTableString, table))
 	return err
 }
