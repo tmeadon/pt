@@ -3,6 +3,8 @@ package db
 import (
 	"database/sql"
 	"fmt"
+	"io"
+	"os"
 	"time"
 
 	"github.com/mattn/go-sqlite3"
@@ -30,10 +32,10 @@ func Backup() (string, error) {
 
 	// create and connect to backup db
 	dstPath := dbPath + "-" + time.Now().Format("2006-01-02T15:04:05-0700")
-	err = ensureDbExists(dstPath)
-	if err != nil {
-		return "", err
-	}
+	// err = ensureDbExists(dstPath)
+	// if err != nil {
+	// 	return "", err
+	// }
 
 	dstDb, err := sql.Open("sqlite3_backup", dstPath)
 	if err != nil {
@@ -55,4 +57,33 @@ func Backup() (string, error) {
 	err = bk.Finish()
 	fmt.Printf("Backed up %s to %s\n", dbPath, dstPath)
 	return dstPath, err
+}
+
+func Restore(bkPath string) error {
+	// rename the existing db
+	err := os.Rename(dbPath, (dbPath + "_tmp"))
+	if err != nil {
+		return err
+	}
+
+	// copy the backup file to the db's previous location
+	src, err := os.Open(bkPath)
+	if err != nil {
+		return err
+	}
+	defer src.Close()
+
+	dst, err := os.Create(dbPath)
+	if err != nil {
+		return err
+	}
+	defer dst.Close()
+
+	_, err = io.Copy(dst, src)
+	if err != nil {
+		return err
+	}
+
+	err = os.Remove(dbPath + "_tmp")
+	return err
 }
