@@ -19,7 +19,7 @@ func getAllExercises(ctx *gin.Context) {
 	if err != nil {
 		panic(err)
 	}
-	ctx.JSON(200, newListResponse(exercises))
+	ctx.JSON(200, newResponse(exercises))
 }
 
 func getExercise(ctx *gin.Context) {
@@ -34,5 +34,5 @@ func getExercise(ctx *gin.Context) {
 		logger.Error(e.Error())
 	}
 
-	ctx.JSON(200, newSingleResponse(exercise))
+	ctx.JSON(200, newResponse(exercise))
 }

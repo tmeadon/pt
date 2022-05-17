@@ -80,16 +80,9 @@ func serveEndpoints(r routes, rg *gin.RouterGroup) {
 	r.addExerciseEndpoints(rg)
 }
 
-func newSingleResponse[T any](result T) apiResponse {
+func newResponse[T any](result T) apiResponse {
 	return apiResponse{
-		Count:   1,
+		Count:   len([]T{result}),
 		Results: result,
-	}
-}
-
-func newListResponse[T any](results []T) apiResponse {
-	return apiResponse{
-		Count:   len(results),
-		Results: results,
 	}
 }
