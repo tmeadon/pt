@@ -11,7 +11,7 @@ import (
 func (r routes) addExerciseEndpoints(rg *gin.RouterGroup) {
 	exercises := rg.Group("/exercises")
 	exercises.GET("/", getAllExercises)
-	exercises.GET("/:id", getExerciseById)
+	exercises.GET("/:id", getExercise)
 }
 
 func getAllExercises(ctx *gin.Context) {
@@ -22,13 +22,13 @@ func getAllExercises(ctx *gin.Context) {
 	ctx.JSON(200, newListResponse(exercises))
 }
 
-func getExerciseById(ctx *gin.Context) {
+func getExercise(ctx *gin.Context) {
 	id, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": "id param is not a valid int"})
 	}
 
-	exercise, errs := db.GetExerciseById(id)
+	exercise, errs := db.GetExercise(id)
 
 	for _, e := range errs {
 		logger.Error(e.Error())

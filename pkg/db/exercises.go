@@ -149,7 +149,7 @@ func listAllExerciseSummaries() ([]models.Exercise, error) {
 	return exercises, nil
 }
 
-func GetExerciseById(id int) (models.Exercise, []error) {
+func GetExercise(id int) (models.Exercise, []error) {
 	errs := make([]error, 0)
 	exercise, err := getExerciseBase(id)
 	if err != nil {
