@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 
 	"github.com/tmeadon/pt/pkg/models"
@@ -65,4 +66,27 @@ func GetAllMuscles() ([]models.Muscle, error) {
 	}
 
 	return muscles, nil
+}
+
+func GetMuscle(id int) DBResponse {
+	query := `select m.id, m.name, m.simple_name, m.is_front
+	from %s as m
+	where m.id = ?
+	`
+
+	row, err := queryRow(fmt.Sprintf(query, tables.MusclesTable), id)
+	if err != nil {
+		return DBResponse{Status: Fail, Error: err}
+	}
+
+	muscle := models.Muscle{}
+	err = row.Scan(&muscle.Id, &muscle.Name, &muscle.SimpleName, &muscle.IsFront)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return DBResponse{Status: Empty}
+		}
+		return DBResponse{Status: Fail, Error: err}
+	}
+
+	return DBResponse{Status: Success, Data: muscle}
 }

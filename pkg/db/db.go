@@ -9,6 +9,20 @@ import (
 var db *sql.DB
 var dbPath string
 
+type OpStatus int64
+
+const (
+	Success OpStatus = iota
+	Empty
+	Fail
+)
+
+type DBResponse struct {
+	Status OpStatus
+	Data   interface{}
+	Error  error
+}
+
 func ConnectDatabase(path string) error {
 	dbPath = path
 
