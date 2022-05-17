@@ -32,10 +32,6 @@ func Backup() (string, error) {
 
 	// create and connect to backup db
 	dstPath := dbPath + "-" + time.Now().Format("2006-01-02T15:04:05-0700")
-	// err = ensureDbExists(dstPath)
-	// if err != nil {
-	// 	return "", err
-	// }
 
 	dstDb, err := sql.Open("sqlite3_backup", dstPath)
 	if err != nil {
