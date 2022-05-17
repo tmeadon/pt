@@ -1,10 +1,10 @@
 package models
 
 type Muscle struct {
-	Id         int
-	Name       string
-	SimpleName string
-	IsFront    bool
+	Id         int    `json:"id"`
+	Name       string `json:"name"`
+	SimpleName string `json:"simple_name"`
+	IsFront    bool   `json:"is_front"`
 }
 
 type Equipment struct {
@@ -26,12 +26,3 @@ type Exercise struct {
 	MusclesSecondary []Muscle
 	Equipment        []Equipment
 }
-
-// type ExerciseBase struct {
-// 	Id               int
-// 	Category         ExerciseCategory
-// 	Muscles          []Muscle
-// 	MusclesSecondary []Muscle
-// 	Equipment        []Equipment
-// 	Exercises        []Exercise
-// }
