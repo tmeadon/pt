@@ -48,19 +48,12 @@ func execMuscleInsert(stmt *sql.Stmt, newMuscle *models.Muscle, keepID bool) err
 func GetAllMuscles() ([]models.Muscle, error) {
 	muscles := make([]models.Muscle, 0)
 
-	stmt, err := db.Prepare(fmt.Sprintf("SELECT id, name, simple_name, is_front from %s", tables.MusclesTable))
-	if err != nil {
-		return []models.Muscle{}, err
-	}
+	query := "select id, name, simple_name, is_front from %s"
+	rows, err := queryRows(fmt.Sprintf(query, tables.MusclesTable))
 
-	rows, err := stmt.Query()
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return []models.Muscle{}, nil
-		}
-		return []models.Muscle{}, err
+	if rows == nil {
+		return muscles, err
 	}
-	defer rows.Close()
 
 	for rows.Next() {
 		muscle := new(models.Muscle)

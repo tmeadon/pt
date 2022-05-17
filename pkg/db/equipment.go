@@ -48,19 +48,12 @@ func execEquipmentInsert(stmt *sql.Stmt, newEquip *models.Equipment, keepID bool
 func GetAllEquipment() ([]models.Equipment, error) {
 	equipment := make([]models.Equipment, 0)
 
-	stmt, err := db.Prepare(fmt.Sprintf("SELECT id, name, full_name, is_front from %s", tables.EquipmentTable))
-	if err != nil {
-		return []models.Equipment{}, err
-	}
+	query := "select id, name from %s"
+	rows, err := queryRows(fmt.Sprintf(query, tables.EquipmentTable))
 
-	rows, err := stmt.Query()
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return []models.Equipment{}, nil
-		}
-		return []models.Equipment{}, err
+	if rows == nil {
+		return equipment, err
 	}
-	defer rows.Close()
 
 	for rows.Next() {
 		eq := new(models.Equipment)
