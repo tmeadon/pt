@@ -12,7 +12,7 @@ RUN if [ "${NODE_VERSION}" != "none" ]; then su vscode -c "umask 0002 && . /usr/
 # RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
 #     && apt-get -y install --no-install-recommends <your-package-list-here>
 
-RUN apt-get update && apt-get install -y sqlite3 libsqlite3-dev
+RUN apt-get update && apt-get install -y sqlite3 libsqlite3-dev fx
 
 # [Optional] Uncomment the next lines to use go get to install anything else you need
 # USER vscode
