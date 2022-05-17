@@ -8,7 +8,7 @@ import (
 )
 
 func GetCategoryById(id int) (models.ExerciseCategory, error) {
-	stmt, err := DB.Prepare(fmt.Sprintf("SELECT id, name from %s WHERE id = ?", tables.ExerciseCategoriesTable))
+	stmt, err := db.Prepare(fmt.Sprintf("SELECT id, name from %s WHERE id = ?", tables.ExerciseCategoriesTable))
 	if err != nil {
 		return models.ExerciseCategory{}, err
 	}
@@ -28,7 +28,7 @@ func GetCategoryById(id int) (models.ExerciseCategory, error) {
 }
 
 func InsertCategory(newCategory models.ExerciseCategory, keepID bool) error {
-	tx, err := DB.Begin()
+	tx, err := db.Begin()
 	if err != nil {
 		return err
 	}

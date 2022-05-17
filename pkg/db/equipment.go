@@ -8,7 +8,7 @@ import (
 )
 
 func InsertEquipment(newEquipment models.Equipment, keepID bool) error {
-	tx, err := DB.Begin()
+	tx, err := db.Begin()
 	if err != nil {
 		return err
 	}
@@ -48,7 +48,7 @@ func execEquipmentInsert(stmt *sql.Stmt, newEquip *models.Equipment, keepID bool
 func GetAllEquipment() ([]models.Equipment, error) {
 	equipment := make([]models.Equipment, 0)
 
-	stmt, err := DB.Prepare(fmt.Sprintf("SELECT id, name, full_name, is_front from %s", tables.EquipmentTable))
+	stmt, err := db.Prepare(fmt.Sprintf("SELECT id, name, full_name, is_front from %s", tables.EquipmentTable))
 	if err != nil {
 		return []models.Equipment{}, err
 	}

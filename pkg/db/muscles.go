@@ -8,7 +8,7 @@ import (
 )
 
 func InsertMuscle(newMuscle models.Muscle, keepID bool) error {
-	tx, err := DB.Begin()
+	tx, err := db.Begin()
 	if err != nil {
 		return err
 	}
@@ -48,7 +48,7 @@ func execMuscleInsert(stmt *sql.Stmt, newMuscle *models.Muscle, keepID bool) err
 func GetAllMuscles() ([]models.Muscle, error) {
 	muscles := make([]models.Muscle, 0)
 
-	stmt, err := DB.Prepare(fmt.Sprintf("SELECT id, name, full_name, is_front from %s", tables.MusclesTable))
+	stmt, err := db.Prepare(fmt.Sprintf("SELECT id, name, simple_name, is_front from %s", tables.MusclesTable))
 	if err != nil {
 		return []models.Muscle{}, err
 	}

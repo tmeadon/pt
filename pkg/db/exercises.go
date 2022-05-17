@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 
 	"github.com/tmeadon/pt/pkg/models"
@@ -9,7 +10,7 @@ import (
 
 func InsertExercise(newExercise models.Exercise, keepID bool) error {
 	// start a transaction
-	tx, err := DB.Begin()
+	tx, err := db.Begin()
 	if err != nil {
 		return err
 	}
@@ -115,4 +116,131 @@ func insertExerciseEquipment(tx *sql.Tx, exerciseId int, equipmentId int) error 
 
 	_, err = stmt.Exec(exerciseId, equipmentId)
 	return err
+}
+
+func ListAllExercises() ([]models.Exercise, error) {
+	// query the db for the exercise bases
+	exercises, err := listAllExerciseSummaries()
+	return exercises, err
+}
+
+func listAllExerciseSummaries() ([]models.Exercise, error) {
+	exercises := make([]models.Exercise, 0)
+
+	query := `select e.id, e.name, c.id, c.name 
+	from %s as e
+	join %s as c on e.category_id = c.id
+	`
+
+	rows, err := queryRows(fmt.Sprintf(query, tables.ExercisesTable, tables.ExerciseCategoriesTable))
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		e := new(models.Exercise)
+		err := rows.Scan(&e.Id, &e.Name, &e.Category.Id, &e.Category.Name)
+		if err != nil {
+			return nil, err
+		}
+		exercises = append(exercises, *e)
+	}
+
+	return exercises, nil
+}
+
+func GetExerciseById(id int) (models.Exercise, []error) {
+	errs := make([]error, 0)
+	exercise, err := getExerciseBase(id)
+	if err != nil {
+		if !errors.Is(err, sql.ErrNoRows) {
+			errs = append(errs, err)
+		}
+		return models.Exercise{}, errs
+	}
+
+	err = getExerciseMuscles(&exercise)
+	if err != nil {
+		errs = append(errs, err)
+	}
+
+	err = getExerciseEquipment(&exercise)
+	if err != nil {
+		errs = append(errs, err)
+	}
+
+	return exercise, errs
+}
+
+func getExerciseBase(id int) (models.Exercise, error) {
+	query := `select e.id, e.name, e.description, c.id, c.name
+	from %s as e
+	join %s as c on e.category_id = c.id
+	where e.id = ?
+	`
+
+	row, err := queryRow(fmt.Sprintf(query, tables.ExercisesTable, tables.ExerciseCategoriesTable), id)
+	if err != nil {
+		return models.Exercise{}, err
+	}
+
+	exercise := models.Exercise{}
+	err = row.Scan(&exercise.Id, &exercise.Name, &exercise.Description, &exercise.Category.Id, &exercise.Category.Name)
+	if err != nil {
+		return models.Exercise{}, err
+	}
+
+	return exercise, nil
+}
+
+func getExerciseMuscles(exercise *models.Exercise) error {
+	query := `select m.id, m.name, m.simple_name, m.is_front, em.is_primary
+	from %s as em
+	join %s as m on em.muscle_id = m.id
+	where em.exercise_id = ?
+	`
+
+	rows, err := queryRows(fmt.Sprintf(query, tables.ExerciseMusclesTable, tables.MusclesTable), exercise.Id)
+	if err != nil {
+		return err
+	}
+
+	for rows.Next() {
+		var isPrimary bool
+		muscle := models.Muscle{}
+		err = rows.Scan(&muscle.Id, &muscle.Name, &muscle.SimpleName, &muscle.IsFront, &isPrimary)
+		if err != nil {
+			return err
+		}
+		if isPrimary {
+			exercise.Muscles = append(exercise.Muscles, muscle)
+		} else {
+			exercise.MusclesSecondary = append(exercise.MusclesSecondary, muscle)
+		}
+	}
+
+	return nil
+}
+
+func getExerciseEquipment(exercise *models.Exercise) error {
+	query := `select e.id, e.name
+	from %s as ee
+	join %s as e on e.id = ee.equipment_id
+	where ee.exercise_id = ?`
+
+	rows, err := queryRows(fmt.Sprintf(query, tables.ExerciseEquipmentTable, tables.EquipmentTable), exercise.Id)
+	if err != nil {
+		return err
+	}
+
+	for rows.Next() {
+		equipment := models.Equipment{}
+		err = rows.Scan(&equipment.Id, &equipment.Name)
+		if err != nil {
+			return err
+		}
+		exercise.Equipment = append(exercise.Equipment, equipment)
+	}
+
+	return nil
 }

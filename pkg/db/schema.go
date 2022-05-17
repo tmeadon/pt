@@ -26,7 +26,7 @@ func ApplyMigrations() error {
 }
 
 func getCurrentSchemaVersion() (int, error) {
-	stmt, err := DB.Prepare(fmt.Sprintf("SELECT version FROM %s WHERE id = 0", tables.SchemaVersionTable))
+	stmt, err := db.Prepare(fmt.Sprintf("SELECT version FROM %s WHERE id = 0", tables.SchemaVersionTable))
 	if err != nil {
 		return 0, err
 	}
@@ -47,7 +47,7 @@ func executeMigration(commandTemplates *[]string) error {
 			return err
 		}
 
-		stmt, err := DB.Prepare(cmd)
+		stmt, err := db.Prepare(cmd)
 		if err != nil {
 			return err
 		}
