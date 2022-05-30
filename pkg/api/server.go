@@ -75,6 +75,8 @@ func serveStatics(statics []Static) {
 func serveEndpoints(r routes, rg *gin.RouterGroup) {
 	r.addMuscleEndpoints(rg)
 	r.addExerciseEndpoints(rg)
+	r.addEquipmentEndpoints(rg)
+	r.addCategoriesEndpoints(rg)
 }
 
 func newResponse[T any](results []T) apiResponse {

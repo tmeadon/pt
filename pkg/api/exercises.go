@@ -14,13 +14,13 @@ func (r routes) addExerciseEndpoints(rg *gin.RouterGroup) {
 }
 
 func getAllExercises(ctx *gin.Context) {
-	Exercises, err := db.GetAllExercises()
+	exercises, err := db.GetAllExercises()
 	if err != nil {
 		handleDBError(err, ctx)
 		return
 	}
 
-	ctx.JSON(200, newResponse(Exercises))
+	ctx.JSON(200, newResponse(exercises))
 }
 
 func getExercise(ctx *gin.Context) {
