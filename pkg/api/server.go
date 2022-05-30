@@ -77,6 +77,7 @@ func serveEndpoints(r routes, rg *gin.RouterGroup) {
 	r.addExerciseEndpoints(rg)
 	r.addEquipmentEndpoints(rg)
 	r.addCategoriesEndpoints(rg)
+	r.addWorkoutEndpoints(rg)
 }
 
 func newResponse[T any](results []T) apiResponse {
@@ -101,4 +102,16 @@ func parseIDParam(ctx *gin.Context) (int, error) {
 		return 0, err
 	}
 	return id, nil
+}
+
+func validateBody[T any](body T, ctx *gin.Context) error {
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest,
+			gin.H{
+				"message": "Invalid inputs. Please check your inputs",
+			},
+		)
+		return err
+	}
+	return nil
 }

@@ -56,8 +56,9 @@ type User struct {
 
 type Workout struct {
 	Id                 int                `json:"id"`
+	Name               string             `json:"name"`
 	CreatedAt          time.Time          `json:"created_at"`
-	UserId             int                `json:"-"`
+	UserId             int                `json:"user_id"`
 	User               User               `json:"user"`
 	ExerciseInstances  []ExerciseInstance `json:"workouts"`
 	ExerciseCategories []ExerciseCategory `json:"exercise_categories" gorm:"many2many:workout_categories"`
