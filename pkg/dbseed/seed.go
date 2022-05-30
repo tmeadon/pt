@@ -1,12 +1,14 @@
 package dbseed
 
 import (
-	"github.com/tmeadon/pt/pkg/db"
-	"github.com/tmeadon/pt/pkg/models"
+	"github.com/tmeadon/pt/pkg/data"
 	"github.com/tmeadon/pt/pkg/wger"
 )
 
-func SeedFromWger() error {
+var db *data.DB
+
+func SeedFromWger(d *data.DB) error {
+	db = d
 	err := seedMusclesFromWger()
 	if err != nil {
 		return err
@@ -37,13 +39,8 @@ func seedMusclesFromWger() error {
 	}
 
 	for _, wm := range muscles {
-		muscle := models.Muscle{
-			Id:         wm.Id,
-			Name:       wm.Name,
-			SimpleName: wm.SimpleName,
-			IsFront:    wm.IsFront,
-		}
-		err = db.InsertMuscle(muscle, true)
+		m := fromWgerMuscle(&wm)
+		_, err = db.InsertMuscle(m)
 		if err != nil {
 			return err
 		}
@@ -59,11 +56,8 @@ func seedEquipmentFromWger() error {
 	}
 
 	for _, we := range equipment {
-		e := models.Equipment{
-			Id:   we.Id,
-			Name: we.Name,
-		}
-		err = db.InsertEquipment(e, true)
+		e := fromWgerEquipmentItem(&we)
+		_, err = db.InsertEquipment(e)
 		if err != nil {
 			return err
 		}
@@ -79,11 +73,8 @@ func seedExerciseCategoriesFromWger() error {
 	}
 
 	for _, wc := range cats {
-		c := models.ExerciseCategory{
-			Id:   wc.Id,
-			Name: wc.Name,
-		}
-		err = db.InsertCategory(c, true)
+		c := fromWgerCategory(&wc)
+		_, err = db.InsertCategory(c)
 		if err != nil {
 			return err
 		}
@@ -100,16 +91,8 @@ func seedExercisesFromWger() error {
 
 	for _, base := range exerciseBases {
 		for _, ex := range filterEnglishExercisesOnly(&base.Exercises) {
-			e := models.Exercise{
-				Id:               ex.Id,
-				Name:             ex.Name,
-				Description:      ex.Description,
-				Category:         fromWgerCategory(&base.Category),
-				Muscles:          fromWgerMuscles(&base.Muscles),
-				MusclesSecondary: fromWgerMuscles(&base.MusclesSecondary),
-				Equipment:        fromWgerEquipment(&base.Equipment),
-			}
-			err = db.InsertExercise(e, true)
+			e := fromWgerExercise(&ex, &base)
+			_, err = db.InsertExercise(e)
 			if err != nil {
 				return err
 			}

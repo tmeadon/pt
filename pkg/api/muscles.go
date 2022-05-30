@@ -2,10 +2,9 @@ package api
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/tmeadon/pt/pkg/db"
+	"github.com/tmeadon/pt/pkg/data"
 )
 
 func (r routes) addMuscleEndpoints(rg *gin.RouterGroup) {
@@ -17,24 +16,24 @@ func (r routes) addMuscleEndpoints(rg *gin.RouterGroup) {
 func getAllMuscles(ctx *gin.Context) {
 	muscles, err := db.GetAllMuscles()
 	if err != nil {
-		panic(err)
+		handleDBError(err, ctx)
+		return
 	}
+
 	ctx.JSON(200, newResponse(muscles))
 }
 
 func getMuscle(ctx *gin.Context) {
-	id, err := strconv.Atoi(ctx.Param("id"))
+	id, err := parseIDParam(ctx)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"message": "id param is not a valid int"})
+		return
 	}
 
-	response := db.GetMuscle(id)
-	if response.Status == db.Empty {
-		ctx.JSON(http.StatusNotFound, response.Data)
-	}
-	if response.Status == db.Fail {
-		panic(response.Error)
+	muscle, err := db.GetMuscle(id)
+	if err != nil {
+		handleDBError(err, ctx)
+		return
 	}
 
-	ctx.JSON(http.StatusOK, newResponse(response.Data))
+	ctx.JSON(http.StatusOK, newResponse([]data.Muscle{muscle}))
 }

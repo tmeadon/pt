@@ -2,10 +2,9 @@ package api
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/tmeadon/pt/pkg/db"
+	"github.com/tmeadon/pt/pkg/data"
 )
 
 func (r routes) addExerciseEndpoints(rg *gin.RouterGroup) {
@@ -15,24 +14,26 @@ func (r routes) addExerciseEndpoints(rg *gin.RouterGroup) {
 }
 
 func getAllExercises(ctx *gin.Context) {
-	exercises, err := db.ListAllExercises()
+	Exercises, err := db.GetAllExercises()
 	if err != nil {
-		panic(err)
+		handleDBError(err, ctx)
+		return
 	}
-	ctx.JSON(200, newResponse(exercises))
+
+	ctx.JSON(200, newResponse(Exercises))
 }
 
 func getExercise(ctx *gin.Context) {
-	id, err := strconv.Atoi(ctx.Param("id"))
+	id, err := parseIDParam(ctx)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"message": "id param is not a valid int"})
+		return
 	}
 
-	exercise, errs := db.GetExercise(id)
-
-	for _, e := range errs {
-		logger.Error(e.Error())
+	exercise, err := db.GetExercise(id)
+	if err != nil {
+		handleDBError(err, ctx)
+		return
 	}
 
-	ctx.JSON(200, newResponse(exercise))
+	ctx.JSON(http.StatusOK, newResponse([]data.Exercise{exercise}))
 }
