@@ -10,7 +10,7 @@
 			// Use -bullseye variants on local arm64/Apple Silicon.
 			"VARIANT": "1.18",
 			// Options
-			"NODE_VERSION": "none"
+			"NODE_VERSION": "18.2.0"
 		}
 	},
 	"runArgs": [ "--cap-add=SYS_PTRACE", "--security-opt", "seccomp=unconfined" ],
@@ -25,7 +25,8 @@
 	// Add the IDs of extensions you want installed when the container is created.
 	"extensions": [
 		"golang.Go",
-		"alexcvzz.vscode-sqlite"
+		"alexcvzz.vscode-sqlite",
+		"vstirbu.vscode-mermaid-preview"
 	],
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
