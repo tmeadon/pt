@@ -17,7 +17,7 @@ func InitDatabase(dbPath string) *DB {
 		panic("failed to open database")
 	}
 
-	err = db.AutoMigrate(&Muscle{}, &Equipment{}, &ExerciseCategory{}, &Exercise{})
+	err = db.AutoMigrate(&Muscle{}, &Equipment{}, &ExerciseCategory{}, &Exercise{}, &ExerciseInstance{}, &ExerciseSet{}, &User{}, &Workout{})
 	if err != nil {
 		panic("failed to apply migration")
 	}
