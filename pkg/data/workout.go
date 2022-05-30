@@ -4,13 +4,13 @@ import "time"
 
 func (db DB) GetAllWorkouts() ([]Workout, error) {
 	var workout []Workout
-	result := db.gorm.Find(&workout)
+	result := db.gorm.Preload("User").Find(&workout)
 	return workout, interpretError(result.Error)
 }
 
 func (db DB) GetWorkout(id int) (Workout, error) {
 	var workout Workout
-	result := db.gorm.First(&workout, id)
+	result := db.gorm.Preload("User").First(&workout, id)
 	return workout, interpretError(result.Error)
 }
 

@@ -14,7 +14,33 @@ type newWorkoutRequest struct {
 
 func (r routes) addWorkoutEndpoints(rg *gin.RouterGroup) {
 	workouts := rg.Group("/workouts")
+	workouts.GET("/", getAllWorkouts)
+	workouts.GET("/:id", getWorkout)
 	workouts.POST("/", newWorkout)
+}
+
+func getAllWorkouts(ctx *gin.Context) {
+	workouts, err := db.GetAllWorkouts()
+	if err != nil {
+		handleDBError(err, ctx)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, newResponse(workouts))
+}
+
+func getWorkout(ctx *gin.Context) {
+	id, err := parseIDParam(ctx)
+	if err != nil {
+		return
+	}
+
+	workout, err := db.GetWorkout(id)
+	if err != nil {
+		handleDBError(err, ctx)
+	}
+
+	ctx.JSON(http.StatusOK, newResponse([]data.Workout{workout}))
 }
 
 func newWorkout(ctx *gin.Context) {

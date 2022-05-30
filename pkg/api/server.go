@@ -78,6 +78,7 @@ func serveEndpoints(r routes, rg *gin.RouterGroup) {
 	r.addEquipmentEndpoints(rg)
 	r.addCategoriesEndpoints(rg)
 	r.addWorkoutEndpoints(rg)
+	r.addUserEndpoints(rg)
 }
 
 func newResponse[T any](results []T) apiResponse {
