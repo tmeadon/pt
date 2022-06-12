@@ -38,9 +38,10 @@ func getWorkout(ctx *gin.Context) {
 	workout, err := db.GetWorkout(id)
 	if err != nil {
 		handleDBError(err, ctx)
+		return
 	}
 
-	ctx.JSON(http.StatusOK, newResponse([]data.Workout{workout}))
+	ctx.JSON(http.StatusOK, newResponse([]data.Workout{*workout}))
 }
 
 func newWorkout(ctx *gin.Context) {
@@ -48,9 +49,11 @@ func newWorkout(ctx *gin.Context) {
 	if err := validateBody(&body, ctx); err != nil {
 		return
 	}
-	workout, err := db.InsertWorkout(&data.Workout{Name: body.Name, UserId: body.UserId})
+	workout := data.Workout{Name: body.Name, UserId: body.UserId}
+	err := db.InsertWorkout(&workout)
 	if err != nil {
 		handleDBError(err, ctx)
+		return
 	}
-	ctx.JSON(http.StatusAccepted, &workout)
+	ctx.JSON(http.StatusCreated, newResponse([]data.Workout{workout}))
 }

@@ -30,7 +30,7 @@ type Exercise struct {
 	Equipment        []Equipment      `json:"equipment" gorm:"many2many:exercise_equipment"`
 }
 
-type ExerciseInstance struct {
+type ExerciseHistory struct {
 	Id         int           `json:"id"`
 	Time       time.Time     `json:"time"`
 	ExerciseId int           `json:"-"`
@@ -42,10 +42,10 @@ type ExerciseInstance struct {
 }
 
 type ExerciseSet struct {
-	Id                 int `json:"id"`
-	WeightKG           int `json:"weight_kg"`
-	Reps               int `json:"reps"`
-	ExerciseInstanceId int `json:"-"`
+	Id                int `json:"id"`
+	WeightKG          int `json:"weight_kg"`
+	Reps              int `json:"reps"`
+	ExerciseHistoryId int `json:"-"`
 }
 
 type User struct {
@@ -60,6 +60,6 @@ type Workout struct {
 	CreatedAt          time.Time          `json:"created_at"`
 	UserId             int                `json:"user_id"`
 	User               User               `json:"user"`
-	ExerciseInstances  []ExerciseInstance `json:"workouts"`
+	ExerciseInstances  []ExerciseHistory  `json:"exercises"`
 	ExerciseCategories []ExerciseCategory `json:"exercise_categories" gorm:"many2many:workout_categories"`
 }

@@ -92,7 +92,7 @@ func seedExercisesFromWger() error {
 	for _, base := range exerciseBases {
 		for _, ex := range filterEnglishExercisesOnly(&base.Exercises) {
 			e := fromWgerExercise(&ex, &base)
-			_, err = db.InsertExercise(e)
+			err = db.InsertExercise(e)
 			if err != nil {
 				return err
 			}

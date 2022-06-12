@@ -35,5 +35,5 @@ func getExercise(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, newResponse([]data.Exercise{exercise}))
+	ctx.JSON(http.StatusOK, newResponse([]data.Exercise{*exercise}))
 }

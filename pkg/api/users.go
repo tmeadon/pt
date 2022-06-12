@@ -35,5 +35,5 @@ func getUser(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, newResponse([]data.User{user}))
+	ctx.JSON(http.StatusOK, newResponse([]data.User{*user}))
 }

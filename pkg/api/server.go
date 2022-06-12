@@ -90,7 +90,7 @@ func newResponse[T any](results []T) apiResponse {
 
 func handleDBError(err error, ctx *gin.Context) {
 	if errors.Is(err, &data.RecordNotFoundError{}) {
-		ctx.Status(404)
+		ctx.JSON(404, gin.H{"message": "not found"})
 		return
 	}
 	panic(err)
@@ -99,7 +99,7 @@ func handleDBError(err error, ctx *gin.Context) {
 func parseIDParam(ctx *gin.Context) (int, error) {
 	id, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"message": "id param is not a valid int"})
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "id param is not a valid int"})
 		return 0, err
 	}
 	return id, nil

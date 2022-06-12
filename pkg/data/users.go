@@ -6,13 +6,13 @@ func (db DB) GetAllUsers() ([]User, error) {
 	return users, interpretError(result.Error)
 }
 
-func (db DB) GetUser(id int) (User, error) {
+func (db DB) GetUser(id int) (*User, error) {
 	var user User
 	result := db.gorm.First(&user, id)
-	return user, interpretError(result.Error)
+	return &user, interpretError(result.Error)
 }
 
-func (db DB) InsertUser(user *User) (*User, error) {
+func (db DB) InsertUser(user *User) error {
 	result := db.gorm.Create(user)
-	return user, interpretError(result.Error)
+	return interpretError(result.Error)
 }
