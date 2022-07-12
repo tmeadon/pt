@@ -2,25 +2,32 @@ package data
 
 import "time"
 
+type Base struct {
+	Id           int       `json:"id"`
+	Created      time.Time `json:"-"`
+	LastModified time.Time `json:"-"`
+	IsDeleted    bool      `json:"-" gorm:"default:false"`
+}
+
 type Muscle struct {
-	Id         int    `json:"id"`
+	Base
 	Name       string `json:"name"`
 	SimpleName string `json:"simple_name"`
 	IsFront    bool   `json:"is_front"`
 }
 
 type Equipment struct {
-	Id   int    `json:"id"`
+	Base
 	Name string `json:"name"`
 }
 
 type ExerciseCategory struct {
-	Id   int    `json:"id"`
+	Base
 	Name string `json:"name"`
 }
 
 type Exercise struct {
-	Id               int              `json:"id"`
+	Base
 	Name             string           `json:"name"`
 	Description      string           `json:"description"`
 	Category         ExerciseCategory `json:"category"`
@@ -31,7 +38,7 @@ type Exercise struct {
 }
 
 type ExerciseHistory struct {
-	Id         int           `json:"id"`
+	Base
 	Time       time.Time     `json:"time"`
 	ExerciseId int           `json:"-"`
 	Exercise   Exercise      `json:"exercise"`
@@ -42,22 +49,21 @@ type ExerciseHistory struct {
 }
 
 type ExerciseSet struct {
-	Id                int `json:"id"`
+	Base
 	WeightKG          int `json:"weight_kg"`
 	Reps              int `json:"reps"`
 	ExerciseHistoryId int `json:"-"`
 }
 
 type User struct {
-	Id       int    `json:"id"`
+	Base
 	Name     string `json:"name"`
 	Username string `json:"username"`
 }
 
 type Workout struct {
-	Id                 int                `json:"id"`
+	Base
 	Name               string             `json:"name"`
-	CreatedAt          time.Time          `json:"created_at"`
 	UserId             int                `json:"user_id"`
 	User               User               `json:"user"`
 	ExerciseInstances  []ExerciseHistory  `json:"exercises"`

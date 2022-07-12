@@ -1,6 +1,10 @@
 package data
 
-import "gorm.io/gorm"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 func (db DB) GetAllExercises() ([]Exercise, error) {
 	var exercises []Exercise
@@ -21,11 +25,16 @@ func (db DB) GetExerciseHistory(id int) (*ExerciseHistory, error) {
 }
 
 func (db DB) InsertExercise(exercise *Exercise) error {
+	exercise.LastModified = time.Now().UTC()
+	exercise.Created = time.Now().UTC()
 	result := db.gorm.Create(exercise)
 	return interpretError(result.Error)
 }
 
 func (db DB) InsertExerciseHistory(history *ExerciseHistory) error {
+	history.Created = time.Now().UTC()
+	history.LastModified = time.Now().UTC()
+
 	workout, err := db.GetWorkout(history.WorkoutId)
 	if err != nil {
 		return interpretError(err)
@@ -43,6 +52,7 @@ func (db DB) InsertExerciseHistory(history *ExerciseHistory) error {
 
 		if !workoutContainsCategory(workout, &exercise.Category) {
 			workout.ExerciseCategories = append(workout.ExerciseCategories, exercise.Category)
+			workout.LastModified = time.Now().UTC()
 			if err := tx.Save(&workout).Error; err != nil {
 				return err
 			}
@@ -52,4 +62,10 @@ func (db DB) InsertExerciseHistory(history *ExerciseHistory) error {
 	})
 
 	return interpretError(err)
+}
+
+func (db DB) UpdateExerciseHistory(history *ExerciseHistory) error {
+	history.LastModified = time.Now().UTC()
+	result := db.gorm.Save(history)
+	return interpretError(result.Error)
 }

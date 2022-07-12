@@ -6,10 +6,11 @@ import (
 )
 
 func fromWgerCategory(wc *wger.ExerciseCategory) *data.ExerciseCategory {
-	return &data.ExerciseCategory{
-		Id:   wc.Id,
+	ec := &data.ExerciseCategory{
 		Name: wc.Name,
 	}
+	ec.Id = wc.Id
+	return ec
 }
 
 func fromWgerMuscles(wgerMuscles *[]wger.Muscle) (muscles []data.Muscle) {
@@ -20,12 +21,13 @@ func fromWgerMuscles(wgerMuscles *[]wger.Muscle) (muscles []data.Muscle) {
 }
 
 func fromWgerMuscle(wm *wger.Muscle) *data.Muscle {
-	return &data.Muscle{
-		Id:         wm.Id,
+	m := &data.Muscle{
 		Name:       wm.Name,
 		SimpleName: wm.SimpleName,
 		IsFront:    wm.IsFront,
 	}
+	m.Id = wm.Id
+	return m
 }
 
 func fromWgerEquipment(wgerEquipment *[]wger.Equipment) (equipment []data.Equipment) {
@@ -36,15 +38,15 @@ func fromWgerEquipment(wgerEquipment *[]wger.Equipment) (equipment []data.Equipm
 }
 
 func fromWgerEquipmentItem(we *wger.Equipment) *data.Equipment {
-	return &data.Equipment{
-		Id:   we.Id,
+	eq := &data.Equipment{
 		Name: we.Name,
 	}
+	eq.Id = we.Id
+	return eq
 }
 
 func fromWgerExercise(we *wger.Exercise, base *wger.ExerciseBase) *data.Exercise {
-	return &data.Exercise{
-		Id:               we.Id,
+	ex := &data.Exercise{
 		Name:             we.Name,
 		Description:      we.Description,
 		Category:         *fromWgerCategory(&base.Category),
@@ -52,4 +54,6 @@ func fromWgerExercise(we *wger.Exercise, base *wger.ExerciseBase) *data.Exercise
 		SecondaryMuscles: fromWgerMuscles(&base.MusclesSecondary),
 		Equipment:        fromWgerEquipment(&base.Equipment),
 	}
+	ex.Id = we.Id
+	return ex
 }

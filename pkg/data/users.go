@@ -1,5 +1,7 @@
 package data
 
+import "time"
+
 func (db DB) GetAllUsers() ([]User, error) {
 	var users []User
 	result := db.gorm.Find(&users)
@@ -13,6 +15,8 @@ func (db DB) GetUser(id int) (*User, error) {
 }
 
 func (db DB) InsertUser(user *User) error {
+	user.Created = time.Now().UTC()
+	user.LastModified = time.Now().UTC()
 	result := db.gorm.Create(user)
 	return interpretError(result.Error)
 }

@@ -1,5 +1,7 @@
 package data
 
+import "time"
+
 func (db DB) GetAllCategories() ([]ExerciseCategory, error) {
 	var categories []ExerciseCategory
 	result := db.gorm.Find(&categories)
@@ -13,6 +15,8 @@ func (db DB) GetCategory(id int) (ExerciseCategory, error) {
 }
 
 func (db DB) InsertCategory(category *ExerciseCategory) (*ExerciseCategory, error) {
+	category.Created = time.Now().UTC()
+	category.LastModified = time.Now().UTC()
 	result := db.gorm.Create(category)
 	return category, interpretError(result.Error)
 }
