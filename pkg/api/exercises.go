@@ -11,6 +11,11 @@ func (r routes) addExerciseEndpoints(rg *gin.RouterGroup) {
 	exercises := rg.Group("/exercises")
 	exercises.GET("/", getAllExercises)
 	exercises.GET("/:id", getExercise)
+
+	history := rg.Group("/exercisehistory")
+	history.POST("/", addExerciseHistory)
+	history.GET("/:id", getExerciseHistory)
+	history.PUT("/:id", updateExerciseHistory)
 }
 
 func getAllExercises(ctx *gin.Context) {
@@ -36,4 +41,69 @@ func getExercise(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, newResponse([]data.Exercise{*exercise}))
+}
+
+func getExerciseHistory(ctx *gin.Context) {
+	id, err := parseIDParam(ctx)
+	if err != nil {
+		return
+	}
+
+	history, err := db.GetExerciseHistory(id)
+	if err != nil {
+		handleDBError(err, ctx)
+	}
+
+	ctx.JSON(http.StatusOK, newResponse([]data.ExerciseHistory{*history}))
+}
+
+func addExerciseHistory(ctx *gin.Context) {
+	body := exerciseHistoryRequest{}
+	if err := validateBody(&body, ctx); err != nil {
+		return
+	}
+
+	if v := validateExerciseHistoryRequest(&body, ctx); !v {
+		return
+	}
+
+	history := body.ToModel()
+
+	err := db.InsertExerciseHistory(history)
+	if err != nil {
+		handleDBError(err, ctx)
+	}
+
+	ctx.JSON(http.StatusCreated, newResponse([]data.ExerciseHistory{*history}))
+}
+
+func updateExerciseHistory(ctx *gin.Context) {
+	id, err := parseIDParam(ctx)
+	if err != nil {
+		return
+	}
+
+	body := exerciseHistoryRequest{}
+	if err := validateBody(&body, ctx); err != nil {
+		return
+	}
+
+	_, err = db.GetExerciseHistory(id)
+	if err != nil {
+		handleDBError(err, ctx)
+	}
+
+	if !validateExerciseHistoryRequest(&body, ctx) {
+		return
+	}
+
+	history := body.ToModel()
+	history.Id = id
+
+	err = db.UpdateExerciseHistory(history)
+	if err != nil {
+		handleDBError(err, ctx)
+	}
+
+	ctx.JSON(http.StatusOK, newResponse([]data.ExerciseHistory{*history}))
 }

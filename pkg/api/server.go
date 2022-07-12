@@ -104,15 +104,3 @@ func parseIDParam(ctx *gin.Context) (int, error) {
 	}
 	return id, nil
 }
-
-func validateBody[T any](body T, ctx *gin.Context) error {
-	if err := ctx.ShouldBindJSON(&body); err != nil {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest,
-			gin.H{
-				"message": "Invalid inputs. Please check your inputs",
-			},
-		)
-		return err
-	}
-	return nil
-}
