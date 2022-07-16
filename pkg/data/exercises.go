@@ -14,7 +14,7 @@ func (db DB) GetAllExercises() ([]Exercise, error) {
 
 func (db DB) GetExercise(id int) (*Exercise, error) {
 	var exercise Exercise
-	result := db.gorm.Preload("Category").Preload("Muscles").Preload("SecondaryMuscles").Preload("Equipment").First(&exercise, id)
+	result := db.gorm.Where("is_deleted = false").Preload("Category").Preload("Muscles").Preload("SecondaryMuscles").Preload("Equipment").First(&exercise, id)
 	return &exercise, interpretError(result.Error)
 }
 
