@@ -1,0 +1,59 @@
+{{ define "exercises.html" }}
+
+{{ template "header.html" . }}
+  
+<h1>Exercises</h1>
+
+<table 
+  id="exercise-table"
+  data-toggle="table"
+  data-search="true"
+  data-sortable="true"
+  data-show-columns="true"
+  data-pagination="true"
+  data-page-size="30">
+    <thead>
+      <tr>
+        <th data-visible="false">ID</th>
+        <th data-sortable="true">Name</th>
+        <th data-sortable="true">Category</th>
+        <th data-sortable="true">Muscles</th>
+        <th data-sortable="true">Equipment</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{ range .Exercises }}
+        <tr>
+          <td>{{ .Id }}</td>
+          <td>{{ .Name }}</td>
+          <td>{{ .Category.Name }}</td>
+          <td>
+            {{ joinMuscleNames .Muscles }}
+          </td>
+          <td>
+            {{ range .Equipment }}
+              {{ print .Name }}
+            {{ end }}
+          </td>
+        </tr>
+      {{ end }}
+    </tbody>
+</table>
+
+<script>
+  var $table = $('#exercise-table')
+  
+  $(function () {
+    $table.on('click-row.bs.table', function (e, row, $element) {
+      console.log(JSON.stringify(row))
+      console.log($element)
+      console.log(row[0])
+      window.location.href = "/exercises/" + row[0]
+
+    })
+  })
+</script>
+
+{{ template "footer.html" . }}
+
+{{ end }}

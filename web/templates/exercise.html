@@ -1,0 +1,33 @@
+{{ define "exercise.html" }}
+
+{{ template "header.html" . }}
+
+<h1>{{ .Exercise.Name }}</h1>
+
+<p>{{ .RenderedDescription }}</p>
+
+<h6>Muscles:</h6>
+<ul>
+    {{ range .Exercise.Muscles }}
+    <li>
+        {{ if .SimpleName }}
+            {{ .SimpleName }}
+        {{ else }}
+            {{ .Name }}
+        {{ end }}
+    </li>
+    {{ end }}
+</ul>
+
+<h6>Equipment:</h6>
+<ul>
+    {{ range .Exercise.Equipment }}
+    <li>
+        {{ .Name }}
+    </li>
+    {{ end }}
+</ul>
+
+{{ template "footer.html". }}
+
+{{end}}
