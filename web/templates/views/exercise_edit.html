@@ -1,0 +1,11 @@
+{{ define "views/exercise_edit.html" }}
+
+{{ template "layouts/header.html" . }}
+
+<form action="/exercises/{{ .Exercise.Id }}" method="post">
+    {{ template "partials/exercise_edit_form_content.html" . }}
+</form>
+
+{{ template "layouts/footer.html" .}}
+
+{{ end }}

@@ -1,0 +1,67 @@
+{{ define "partials/exercise_edit_form_content.html" }}
+
+{{ $exercise := .Exercise }}
+
+<div class="mb-3">
+    <label for="name" class="form-label">Name</label>
+    <input name="name" value="{{ .Exercise.Name }}" class="form-control form-control-lg" type="text"
+        placeholder="Exercise name...">
+</div>
+<div class="mb-3">
+    <label for="description" class="form-label">Description</label>
+    <textarea name="description" class="form-control" rows="5">{{ .Exercise.Description }}</textarea>
+</div>
+<div class="mb-3">
+    <select name="category" class="form-select">
+        {{ range .Categories }}
+            <option value="{{ .Id }}" {{ if eq $exercise.Category.Id .Id }} selected {{ end }}>{{ .Name }}</option>
+        {{ end }}
+    </select>
+</div>
+<div class="mt-3 mb-3">Muscles</div>
+<div class="mb-4">
+    {{ range .Muscles }}
+    <div class="form-check form-check-inline">
+        <input name="muscles" class="form-check-input" type="checkbox" id="checkbox-muscle{{ .Id }}" value="{{ .Id }}"
+            {{ if ExerciseContainsMuscle $exercise . }}checked{{ end }}>
+            <label class="form-check-label" for="checkbox-muscle{{ .Id }}"> 
+                {{ if .SimpleName }}
+                    {{ .SimpleName }}
+                {{ else }}
+                    {{ .Name }}
+                {{ end }}
+            </label>
+        </div>
+        {{ end }}
+    </div>
+</div>
+<div class="mt-3 mb-3">Secondary Muscles</div>
+<div class="mb-4">
+    {{ range .Muscles }}
+    <div class="form-check form-check-inline">
+        <input name="sec-muscles" class="form-check-input" type="checkbox" id="checkbox-sec-muscle{{ .Id }}" value="{{ .Id }}"
+            {{ if ExerciseContainsSecMuscle $exercise . }}checked{{ end }}>
+            <label class="form-check-label" for="checkbox-sec-muscle{{ .Id }}"> 
+                {{ if .SimpleName }}
+                    {{ .SimpleName }}
+                {{ else }}
+                    {{ .Name }}
+                {{ end }}
+            </label>
+        </div>
+        {{ end }}
+    </div>
+</div>
+<div class="mt-3 mb-3">Equipment</div>
+<div class="mb-4">
+    {{ range .Equipment }}
+        <div class="form-check form-check-inline">
+            <input name="equipment" class="form-check-input" type="checkbox" id="checkbox-equipment{{ .Id }}" value="{{ .Id }}"
+            {{ if ExerciseContainsEquipment $exercise . }}checked{{ end }}>
+            <label class="form-check-label" for="checkbox-equipment{{ .Id }}">{{ .Name }}</label>
+        </div>
+    {{ end }}
+</div>
+<button type="submit" class="btn btn-primary">Submit</button>
+
+{{ end }}

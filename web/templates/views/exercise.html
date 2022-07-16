@@ -1,0 +1,66 @@
+{{ define "views/exercise.html" }}
+
+{{ template "layouts/header.html" . }}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">Home</li>
+      <li class="breadcrumb-item"><a href="/exercises">Exercises</a></li>
+      <li class="breadcrumb-item active">{{ .Exercise.Name }}</li>
+    </ol>
+</nav>
+
+<h1>
+    {{ .Exercise.Name }}
+    <small class="text-muted">{{ .Exercise.Category.Name }}</small>
+</h1>
+
+<p>{{ .RenderedDescription }}</p>
+
+<h6>Muscles</h6>
+<ul>
+    {{ range .Exercise.Muscles }}
+    <li>
+        {{ if .SimpleName }}
+            {{ .SimpleName }}
+        {{ else }}
+            {{ .Name }}
+        {{ end }}
+    </li>
+    {{ end }}
+</ul>
+
+{{ if ExerciseHasSecondaryMuscles .Exercise }}
+    <h6>Secondary Muscles</h6>
+    <ul>
+        {{ range .Exercise.SecondaryMuscles }}
+        <li>
+            {{ if .SimpleName }}
+                {{ .SimpleName }}
+            {{ else }}
+                {{ .Name }}
+            {{ end }}
+        </li>
+        {{ end }}
+    </ul>
+{{ end }}
+
+<h6>Equipment</h6>
+<ul>
+    {{ range .Exercise.Equipment }}
+    <li>
+        {{ .Name }}
+    </li>
+    {{ end }}
+</ul>
+
+<a class="btn btn-primary" href="/exercises/{{ .Exercise.Id }}/edit" role="button">Edit</a>
+<!-- <a class="btn btn-danger" href="/exercises//edit" role="button">Edit</a> -->
+
+<form action="/exercises/{{ .Exercise.Id }}/delete" method="post">
+    <button type="submit" class="btn btn-danger">Delete</button>
+</form>
+
+{{ template "layouts/footer.html". }}
+
+{{end}}

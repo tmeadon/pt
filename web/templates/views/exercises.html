@@ -1,8 +1,17 @@
-{{ define "exercises.html" }}
+{{ define "views/exercises.html" }}
 
-{{ template "header.html" . }}
+{{ template "layouts/header.html" . }}
   
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">Home</li>
+    <li class="breadcrumb-item active">Exercises</li>
+  </ol>
+</nav>
+
 <h1>Exercises</h1>
+
+<a class="btn btn-primary" href="/exercises/new" role="button">New</a>
 
 <table 
   id="exercise-table"
@@ -28,7 +37,7 @@
           <td>{{ .Name }}</td>
           <td>{{ .Category.Name }}</td>
           <td>
-            {{ joinMuscleNames .Muscles }}
+            {{ JoinMuscleNames .Muscles }}
           </td>
           <td>
             {{ range .Equipment }}
@@ -54,6 +63,6 @@
   })
 </script>
 
-{{ template "footer.html" . }}
+{{ template "layouts/footer.html" . }}
 
 {{ end }}
