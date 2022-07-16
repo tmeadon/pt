@@ -241,6 +241,4 @@ func deleteExercise(ctx *gin.Context) {
 	if err != nil {
 		panic(err)
 	}
-
-	ctx.Redirect(http.StatusFound, "/exercises")
 }

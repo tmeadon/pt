@@ -55,11 +55,16 @@
 </ul>
 
 <a class="btn btn-primary" href="/exercises/{{ .Exercise.Id }}/edit" role="button">Edit</a>
-<!-- <a class="btn btn-danger" href="/exercises//edit" role="button">Edit</a> -->
+<button type="button" class="btn btn-danger" onclick="deleteExercise();">Delete</button>
 
-<form action="/exercises/{{ .Exercise.Id }}/delete" method="post">
-    <button type="submit" class="btn btn-danger">Delete</button>
-</form>
+<script>
+    function deleteExercise() {
+        if (confirm("Are you sure you want to delete {{ .Exercise.Name }}?") == true) {
+            fetch("/exercises/{{ .Exercise.Id }}/delete", { method: "POST" })
+            window.location.href = "/exercises/"
+        }
+    }
+</script>
 
 {{ template "layouts/footer.html". }}
 
