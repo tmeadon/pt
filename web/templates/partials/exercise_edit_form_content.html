@@ -63,5 +63,6 @@
     {{ end }}
 </div>
 <button type="submit" class="btn btn-primary">Submit</button>
+<a href='{{ if eq .RequestPath "/exercises/new" }}/exercises{{ else }}{{ print "/exercises/" .Exercise.Id }}{{ end }}' id="cancel" name="cancel" class="btn btn-secondary">Cancel</a>
 
 {{ end }}

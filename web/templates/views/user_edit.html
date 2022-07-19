@@ -1,0 +1,19 @@
+{{ define "views/user_edit.html" }}
+
+{{ template "layouts/header.html" . }}
+
+<h4>{{ .Username }}</h4>
+
+<form action="/users/{{ .Id }}" method="post">    
+    <div class="mb-3">
+        <label for="name" class="form-label">Name</label>
+        <input name="name" value="{{ .Name }}" class="form-control form-control-lg" type="text"
+            placeholder="name...">
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+    <a href='/users' id="cancel" name="cancel" class="btn btn-secondary">Cancel</a>
+</form>
+
+{{ template "layouts/footer.html" .}}
+
+{{ end }}

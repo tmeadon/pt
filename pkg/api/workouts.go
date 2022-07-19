@@ -56,7 +56,7 @@ func newWorkout(ctx *gin.Context) {
 	}
 
 	workout := data.Workout{Name: body.Name, UserId: body.UserId}
-	err := db.InsertWorkout(&workout)
+	err := db.SaveWorkout(&workout)
 	if err != nil {
 		handleDBError(err, ctx)
 		return

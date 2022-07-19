@@ -4,28 +4,41 @@ import (
 	"time"
 )
 
+type Workout struct {
+	Base
+	Name               string             `json:"name"`
+	UserId             int                `json:"user_id"`
+	User               User               `json:"user"`
+	ExerciseInstances  []ExerciseHistory  `json:"exercises"`
+	ExerciseCategories []ExerciseCategory `json:"exercise_categories" gorm:"many2many:workout_categories"`
+}
+
+func NewWorkout(userID int) *Workout {
+	now := time.Now().UTC()
+	return &Workout{
+		Base: Base{
+			Created:      now,
+			LastModified: now,
+		},
+		UserId: userID,
+	}
+}
+
 func (db DB) GetAllWorkouts() ([]Workout, error) {
 	var workout []Workout
-	result := db.gorm.Preload("User").Find(&workout, "is_deleted == false")
+	result := db.gorm.Where("is_deleted = false").Preload("User").Find(&workout, "is_deleted == false")
 	return workout, interpretError(result.Error)
 }
 
 func (db DB) GetWorkout(id int) (*Workout, error) {
 	var workout Workout
-	result := db.gorm.Preload("User").Preload("ExerciseCategories").Preload("ExerciseInstances.Exercise").Preload("ExerciseInstances.Sets").First(&workout, id)
+	result := db.gorm.Where("is_deleted = false").Preload("User").Preload("ExerciseCategories").Preload("ExerciseInstances.Exercise").Preload("ExerciseInstances.Sets").First(&workout, id)
 	return &workout, interpretError(result.Error)
 }
 
-func (db DB) InsertWorkout(workout *Workout) error {
-	workout.Created = time.Now().UTC()
-	workout.LastModified = time.Now().UTC()
-	result := db.gorm.Create(workout)
-	return interpretError(result.Error)
-}
-
-func (db DB) UpdateWorkout(workout *Workout) error {
-	workout.LastModified = time.Now().UTC()
-	result := db.gorm.Save(workout)
+func (db DB) SaveWorkout(w *Workout) error {
+	w.LastModified = time.Now().UTC()
+	result := db.gorm.Save(w)
 	return interpretError(result.Error)
 }
 

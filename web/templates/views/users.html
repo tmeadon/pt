@@ -1,0 +1,60 @@
+{{ define "views/users.html" }}
+
+{{ template "layouts/header.html" . }}
+  
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/">Home</a></li>
+    <li class="breadcrumb-item active">Users</li>
+  </ol>
+</nav>
+
+<h1>Users</h1>
+
+<a class="btn btn-primary" href="/users/new" role="button">New</a>
+
+<table 
+  id="user-table"
+  data-toggle="table"
+  data-search="true"
+  data-sortable="true"
+  data-show-columns="true"
+  data-pagination="true"
+  data-page-size="30">
+    <thead>
+      <tr>
+        <th data-visible="false">ID</th>
+        <th data-sortable="true">Name</th>
+        <th data-sortable="true">Username</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {{ range .Users }}
+        <tr>
+          <td>{{ .Id }}</td>
+          <td>{{ .Name }}</td>
+          <td>{{ .Username }}</td>
+          <td>
+            <a class="btn btn-primary" href="/users/{{ .Id }}/edit" role="button">Edit</a>
+            <button type="button" class="btn btn-danger" onclick='deleteUser("{{ .Id }}", "{{ .Name }}")'>Delete</button>
+          </td>
+          
+        </tr>
+      {{ end }}
+    </tbody>
+</table>
+
+<script>
+    function deleteUser(uid, uname) {
+        console.log(uid, uname)
+        if (confirm(`Are you sure you want to delete user ${uname}?`) == true) {
+            fetch(`/users/${uid}/delete`, { method: "POST" })
+            window.location.href = "/users/"
+        }
+    }
+</script>
+
+{{ template "layouts/footer.html" . }}
+
+{{ end }}

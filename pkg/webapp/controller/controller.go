@@ -9,5 +9,8 @@ var db *data.DB
 
 func LoadRoutes(d *data.DB, rg *gin.RouterGroup) {
 	db = d
+	loadHomepageRoutes(rg)
 	loadExerciseRoutes(rg)
+	loadUserRoutes(rg)
+	loadWorkoutRoutes(rg)
 }

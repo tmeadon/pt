@@ -1,0 +1,96 @@
+{{ define "views/workouts.html" }}
+
+{{ template "layouts/header.html" . }}
+  
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/">Home</a></li>
+    <li class="breadcrumb-item active">Workouts</li>
+  </ol>
+</nav>
+
+<h1>Workouts</h1>
+
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newWorkoutModal">New</button>
+
+<table 
+  id="workout-table"
+  data-toggle="table"
+  data-search="true"
+  data-sortable="true"
+  data-show-columns="true"
+  data-pagination="true"
+  data-page-size="30">
+    <thead>
+      <tr>
+        <th data-visible="false">ID</th>
+        <th data-sortable="true">Name</th>
+        <th data-sortable="true">Created</th>
+        <th data-sortable="true">User</th>
+        <th data-sortable="true">Exercise Categories</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{ range .Workouts }}
+        <tr>
+          <td>{{ .Id }}</td>
+          <td>{{ .Name }}</td>
+          <td>{{ .Created.Local.Format "02 Jan 2006 15:04 UTC" }}</td>
+          <td>{{ .User.Name }}</td>
+          <td>
+            {{ JoinCategoryNames .ExerciseCategories }}
+          </td>
+        </tr>
+      {{ end }}
+    </tbody>
+</table>
+
+<!-- Modal -->
+<div class="modal fade" id="newWorkoutModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="newWorkoutModalLabel">New Workout</h5>
+        <button type="button" class="close" data-bs-dismiss="modal">
+          <span>&times;</span>
+        </button>
+      </div>
+      <form action="/workouts" method="post">
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
+            <input name="name" placeholder="Name" class="form-control" type="text">
+          </div>
+          <div class="mb-3">
+            <label for="userSelect" class="form-label">User</label>
+            <select name="userid" class="form-control" id="userSelect">
+              {{ range .Users }}
+                <option value="{{ .Id }}">{{ .Name }}</option>
+              {{ end }}
+            </select> 
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary" data-dismiss="modal">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  var $table = $('#exercise-table')
+  
+  $(function () {
+    $table.on('click-row.bs.table', function (e, row, $element) {
+      console.log(JSON.stringify(row))
+      console.log($element)
+      console.log(row[0])
+      window.location.href = "/workouts/" + row[0]
+    })
+  })
+</script>
+
+{{ template "layouts/footer.html" . }}
+
+{{ end }}

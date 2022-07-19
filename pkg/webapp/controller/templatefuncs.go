@@ -14,6 +14,8 @@ func TemplateFuncs() template.FuncMap {
 		"ExerciseContainsEquipment":   exerciseContainsEquipment,
 		"ExerciseHasSecondaryMuscles": exerciseHasSecondaryMuscles,
 		"JoinMuscleNames":             joinMuscleNames,
+		"JoinEquipmentNames":          joinEquipmentNames,
+		"JoinCategoryNames":           joinCategoryNames,
 	}
 }
 
@@ -56,6 +58,22 @@ func joinMuscleNames(muscles []data.Muscle) string {
 			continue
 		}
 		names = append(names, m.Name)
+	}
+	return strings.Join(names, ", ")
+}
+
+func joinEquipmentNames(equipment []data.Equipment) string {
+	names := make([]string, 0)
+	for _, e := range equipment {
+		names = append(names, e.Name)
+	}
+	return strings.Join(names, ", ")
+}
+
+func joinCategoryNames(categories []data.ExerciseCategory) string {
+	names := make([]string, 0)
+	for _, e := range categories {
+		names = append(names, e.Name)
 	}
 	return strings.Join(names, ", ")
 }
