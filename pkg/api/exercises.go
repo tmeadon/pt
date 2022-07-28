@@ -69,7 +69,7 @@ func addExerciseHistory(ctx *gin.Context) {
 
 	history := body.ToModel()
 
-	err := db.InsertExerciseHistory(history)
+	err := db.SaveExerciseHistory(history)
 	if err != nil {
 		handleDBError(err, ctx)
 	}
@@ -100,7 +100,7 @@ func updateExerciseHistory(ctx *gin.Context) {
 	history := body.ToModel()
 	history.Id = id
 
-	err = db.UpdateExerciseHistory(history)
+	err = db.SaveExerciseHistory(history)
 	if err != nil {
 		handleDBError(err, ctx)
 	}

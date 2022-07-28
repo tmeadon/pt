@@ -35,7 +35,7 @@
         <tr>
           <td>{{ .Id }}</td>
           <td>{{ .Name }}</td>
-          <td>{{ .Created.Local.Format "02 Jan 2006 15:04 UTC" }}</td>
+          <td id="createdTime{{ .Id }}"> <!-- set by setCreatedTime() --></td>
           <td>{{ .User.Name }}</td>
           <td>
             {{ JoinCategoryNames .ExerciseCategories }}
@@ -79,16 +79,21 @@
 </div>
 
 <script>
-  var $table = $('#exercise-table')
+  var $table = $('#workout-table')
   
   $(function () {
     $table.on('click-row.bs.table', function (e, row, $element) {
-      console.log(JSON.stringify(row))
-      console.log($element)
-      console.log(row[0])
       window.location.href = "/workouts/" + row[0]
     })
   })
+
+  function setCreatedTime(id, created) {
+    document.getElementById(`createdTime${id}`).innerHTML = formatCreatedDate(created)
+  }
+
+  {{ range .Workouts }}
+    setCreatedTime("{{ .Id }}", "{{ .Created }}")
+  {{ end }}
 </script>
 
 {{ template "layouts/footer.html" . }}

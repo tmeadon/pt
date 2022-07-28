@@ -52,11 +52,7 @@
   
   $(function () {
     $table.on('click-row.bs.table', function (e, row, $element) {
-      console.log(JSON.stringify(row))
-      console.log($element)
-      console.log(row[0])
       window.location.href = "/exercises/" + row[0]
-
     })
   })
 </script>

@@ -7,6 +7,10 @@ import (
 )
 
 func parseIDParam(ctx *gin.Context) (int, error) {
-	id, err := strconv.Atoi(ctx.Param("id"))
+	return parseIntParam(ctx, "id")
+}
+
+func parseIntParam(ctx *gin.Context, name string) (int, error) {
+	id, err := strconv.Atoi(ctx.Param(name))
 	return id, err
 }

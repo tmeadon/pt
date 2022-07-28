@@ -21,7 +21,6 @@ func (e *exerciseHistoryRequest) ToModel() *data.ExerciseHistory {
 	}
 
 	return &data.ExerciseHistory{
-		Time:       e.Time,
 		ExerciseId: e.ExerciseId,
 		UserId:     e.UserId,
 		WorkoutId:  e.WorkoutId,

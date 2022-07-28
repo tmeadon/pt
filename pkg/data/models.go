@@ -25,21 +25,3 @@ type ExerciseCategory struct {
 	Base
 	Name string `json:"name"`
 }
-
-type ExerciseHistory struct {
-	Base
-	Time       time.Time     `json:"time"`
-	ExerciseId int           `json:"-"`
-	Exercise   Exercise      `json:"exercise"`
-	UserId     int           `json:"-"`
-	User       User          `json:"user"`
-	Sets       []ExerciseSet `json:"sets"`
-	WorkoutId  int           `json:"-"`
-}
-
-type ExerciseSet struct {
-	Base
-	WeightKG          int `json:"weight_kg"`
-	Reps              int `json:"reps"`
-	ExerciseHistoryId int `json:"-"`
-}

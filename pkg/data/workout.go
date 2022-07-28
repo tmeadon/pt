@@ -24,22 +24,17 @@ func NewWorkout(userID int) *Workout {
 	}
 }
 
-func (db DB) GetAllWorkouts() ([]Workout, error) {
-	var workout []Workout
-	result := db.gorm.Where("is_deleted = false").Preload("User").Find(&workout, "is_deleted == false")
-	return workout, interpretError(result.Error)
+func (w *Workout) SetExerciseCategories() {
+	for _, e := range w.ExerciseInstances {
+		if !workoutContainsCategory(w, &e.Exercise.Category) {
+			w.AddExerciseCategory(&e.Exercise.Category)
+		}
+	}
 }
 
-func (db DB) GetWorkout(id int) (*Workout, error) {
-	var workout Workout
-	result := db.gorm.Where("is_deleted = false").Preload("User").Preload("ExerciseCategories").Preload("ExerciseInstances.Exercise").Preload("ExerciseInstances.Sets").First(&workout, id)
-	return &workout, interpretError(result.Error)
-}
-
-func (db DB) SaveWorkout(w *Workout) error {
+func (w *Workout) AddExerciseCategory(cat *ExerciseCategory) {
 	w.LastModified = time.Now().UTC()
-	result := db.gorm.Save(w)
-	return interpretError(result.Error)
+	w.ExerciseCategories = append(w.ExerciseCategories, *cat)
 }
 
 func workoutContainsCategory(workout *Workout, cat *ExerciseCategory) bool {
@@ -51,9 +46,40 @@ func workoutContainsCategory(workout *Workout, cat *ExerciseCategory) bool {
 	return false
 }
 
+func (db DB) GetAllWorkouts() ([]Workout, error) {
+	var workout []Workout
+	result := db.gorm.Where("is_deleted = false").Preload("User").Preload("ExerciseCategories").Find(&workout, "is_deleted == false")
+	return workout, interpretError(result.Error)
+}
+
+func (db DB) GetWorkout(id int) (*Workout, error) {
+	var workout Workout
+	result := db.gorm.Where("is_deleted = false").Preload("User").Preload("ExerciseCategories").Preload("ExerciseInstances", "is_deleted = false").Preload("ExerciseInstances.Exercise").Preload("ExerciseInstances.Sets").First(&workout, id)
+	return &workout, interpretError(result.Error)
+}
+
+func (db DB) SaveWorkout(w *Workout) error {
+	w.LastModified = time.Now().UTC()
+	result := db.gorm.Save(w)
+	db.updateWorkoutCategories(w)
+	return interpretError(result.Error)
+}
+
 func (db DB) DeleteWorkout(workout *Workout) error {
 	workout.LastModified = time.Now().UTC()
 	workout.IsDeleted = true
 	result := db.gorm.Save(workout)
 	return interpretError(result.Error)
+}
+
+func (db DB) updateWorkoutCategories(workout *Workout) {
+	var w Workout
+	db.gorm.Preload("ExerciseInstances", "is_deleted = false").Preload("ExerciseInstances.Exercise.Category").First(&w, workout.Id)
+
+	cats := make([]ExerciseCategory, 0)
+	for _, e := range w.ExerciseInstances {
+		cats = append(cats, e.Exercise.Category)
+	}
+
+	db.gorm.Model(&w).Association("ExerciseCategories").Replace(cats)
 }
