@@ -5,29 +5,32 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"strings"
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
 )
 
-var container *azblob.ContainerClient
+type BackupContainer struct {
+	container *azblob.ContainerClient
+}
+
+func NewBackupContainer(sasToken string) (*BackupContainer, error) {
+	c, err := azblob.NewContainerClientWithNoCredential(sasToken, nil)
+	if err != nil {
+		return &BackupContainer{}, err
+	}
+
+	container := BackupContainer{container: c}
+	return &container, nil
+}
 
 type cloudBlob struct {
 	Name         string
 	LastModified time.Time
 }
 
-func ConnectContainer(sasToken string) error {
-	con, err := azblob.NewContainerClientWithNoCredential(sasToken, nil)
-	if err != nil {
-		return err
-	}
-
-	container = con
-	return nil
-}
-
-func Upload(srcPath string) error {
+func (c *BackupContainer) Upload(srcPath string) error {
 	// check src exists
 	if _, err := os.Stat(srcPath); err != nil {
 		return err
@@ -41,7 +44,7 @@ func Upload(srcPath string) error {
 	defer file.Close()
 
 	// create a blob client
-	blobClient, err := container.NewBlockBlobClient(path.Base(srcPath))
+	blobClient, err := c.container.NewBlockBlobClient(path.Base(srcPath))
 	if err != nil {
 		return err
 	}
@@ -52,24 +55,25 @@ func Upload(srcPath string) error {
 		return err
 	}
 
-	fmt.Printf("Uploaded %s to %s\n", srcPath, blobClient.URL())
+	fmt.Printf("Uploaded %s to %s\n", srcPath, strings.Split(c.container.URL(), "?")[0])
 	return nil
 }
 
-func DownloadNewest(dstFilePath string) error {
-	if container == nil {
-		return fmt.Errorf("container client has not been initialised")
+func (c *BackupContainer) DownloadNewest(dstFilePath string) (string, error) {
+	blobs := c.listAllBlobs()
+	if len(blobs) == 0 {
+		return "", fmt.Errorf("no backups found in blob container")
 	}
-	blobs := listAllBlobs()
-	newestBlob := findNewestBlob(&blobs)
-	err := downloadBlob(newestBlob.Name, dstFilePath)
-	return err
+
+	newestBlob := findNewestBlob(blobs)
+	err := c.downloadBlob(newestBlob.Name, dstFilePath)
+	return newestBlob.Name, err
 }
 
-func listAllBlobs() []cloudBlob {
+func (c *BackupContainer) listAllBlobs() []cloudBlob {
 	allBlobs := make([]cloudBlob, 0)
 
-	pager := container.ListBlobsFlat(&azblob.ContainerListBlobsFlatOptions{})
+	pager := c.container.ListBlobsFlat(&azblob.ContainerListBlobsFlatOptions{})
 
 	for pager.NextPage(context.Background()) {
 		pageItems := pager.PageResponse().ListBlobsFlatSegmentResponse.Segment.BlobItems
@@ -81,9 +85,9 @@ func listAllBlobs() []cloudBlob {
 	return allBlobs
 }
 
-func findNewestBlob(blobs *[]cloudBlob) cloudBlob {
-	newestBlob := (*blobs)[0]
-	for _, b := range *blobs {
+func findNewestBlob(blobs []cloudBlob) cloudBlob {
+	newestBlob := blobs[0]
+	for _, b := range blobs {
 		if b.LastModified.After(newestBlob.LastModified) {
 			newestBlob = b
 		}
@@ -91,7 +95,7 @@ func findNewestBlob(blobs *[]cloudBlob) cloudBlob {
 	return newestBlob
 }
 
-func downloadBlob(name string, dstFilePath string) error {
+func (c *BackupContainer) downloadBlob(name string, dstFilePath string) error {
 	// check if file already exists
 	if _, err := os.Stat(dstFilePath); err == nil {
 		return fmt.Errorf("file already exists at path %s", dstFilePath)
@@ -105,7 +109,7 @@ func downloadBlob(name string, dstFilePath string) error {
 	defer file.Close()
 
 	// create a blob client and download the file
-	blobClient, err := container.NewBlockBlobClient(name)
+	blobClient, err := c.container.NewBlockBlobClient(name)
 	if err != nil {
 		return err
 	}
