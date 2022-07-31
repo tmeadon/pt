@@ -36,19 +36,6 @@ func (s *Server) Start() error {
 	s.gin.Static("/js", "./web/static/js")
 	s.gin.StaticFile("/favicon.ico", "./web/img/favicon.ico")
 
-	// r.GET("/", func(ctx *gin.Context) {
-	// 	exercises, err := db.GetAllExercises()
-	// 	if err != nil {
-	// 		panic(err)
-	// 	}
-	// 	ctx.HTML(
-	// 		http.StatusOK,
-	// 		"index.html",
-	// 		gin.H{
-	// 			"Exercises": exercises,
-	// 		},
-	// 	)
-	// })
 	s.gin.Run()
 	return nil
 }
