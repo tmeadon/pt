@@ -11,27 +11,27 @@ import (
 	"github.com/tmeadon/pt/pkg/data"
 )
 
-func loadWorkoutRoutes(rg *gin.RouterGroup) {
-	g := rg.Group("/workouts")
+func (c *Controller) loadWorkoutRoutes() {
+	g := c.baseRouterGroup.Group("/workouts")
 
-	g.GET("/", allWorkouts)
-	g.GET("/:id", workout)
-	g.POST("/", createWorkout)
-	g.POST("/:id/delete", deleteWorkout)
-	g.POST("/:id/exercise", addWorkoutExercise)
-	g.POST("/:id/exercise/:exId/delete", deleteWorkoutExercise)
-	g.POST("/:id/exercise/:exId/sets", addWorkoutSet)
-	g.POST("/:id/sets/:setId", updateWorkoutSet)
-	g.POST("/:id/sets/:setId/delete", deleteWorkoutSet)
+	g.GET("/", c.allWorkouts)
+	g.GET("/:id", c.workout)
+	g.POST("/", c.createWorkout)
+	g.POST("/:id/delete", c.deleteWorkout)
+	g.POST("/:id/exercise", c.addWorkoutExercise)
+	g.POST("/:id/exercise/:exId/delete", c.deleteWorkoutExercise)
+	g.POST("/:id/exercise/:exId/sets", c.addWorkoutSet)
+	g.POST("/:id/sets/:setId", c.updateWorkoutSet)
+	g.POST("/:id/sets/:setId/delete", c.deleteWorkoutSet)
 }
 
-func allWorkouts(ctx *gin.Context) {
-	workouts, err := db.GetAllWorkouts()
+func (c *Controller) allWorkouts(ctx *gin.Context) {
+	workouts, err := c.db.GetAllWorkouts()
 	if err != nil && !errors.Is(err, &data.RecordNotFoundError{}) {
 		panic(err)
 	}
 
-	users, err := db.GetAllUsers()
+	users, err := c.db.GetAllUsers()
 	if err != nil && !errors.Is(err, &data.RecordNotFoundError{}) {
 		panic(err)
 	}
@@ -46,19 +46,19 @@ func allWorkouts(ctx *gin.Context) {
 	)
 }
 
-func workout(ctx *gin.Context) {
+func (c *Controller) workout(ctx *gin.Context) {
 	id, err := parseIDParam(ctx)
 	if err != nil {
 		ctx.Redirect(http.StatusFound, "/workouts")
 		return
 	}
 
-	w, ok := getWorkoutAndHandleErrors(id, ctx)
+	w, ok := c.getWorkoutAndHandleErrors(id, ctx)
 	if !ok {
 		return
 	}
 
-	ex, err := db.GetAllExercises()
+	ex, err := c.db.GetAllExercises()
 	if err != nil {
 		panic(err)
 	}
@@ -78,8 +78,8 @@ func workout(ctx *gin.Context) {
 	)
 }
 
-func getWorkoutAndHandleErrors(id int, ctx *gin.Context) (*data.Workout, bool) {
-	u, err := db.GetWorkout(id)
+func (c *Controller) getWorkoutAndHandleErrors(id int, ctx *gin.Context) (*data.Workout, bool) {
+	u, err := c.db.GetWorkout(id)
 	if err != nil {
 		var notFoundErr *data.RecordNotFoundError
 		if errors.As(err, &notFoundErr) {
@@ -91,8 +91,8 @@ func getWorkoutAndHandleErrors(id int, ctx *gin.Context) (*data.Workout, bool) {
 	return u, true
 }
 
-func getSetAndHandleError(id int, ctx *gin.Context) (*data.ExerciseSet, bool) {
-	s, err := db.GetSet(id)
+func (c *Controller) getSetAndHandleError(id int, ctx *gin.Context) (*data.ExerciseSet, bool) {
+	s, err := c.db.GetSet(id)
 	if err != nil {
 		var notFoundErr *data.RecordNotFoundError
 		if errors.As(err, &notFoundErr) {
@@ -104,8 +104,8 @@ func getSetAndHandleError(id int, ctx *gin.Context) (*data.ExerciseSet, bool) {
 	return s, true
 }
 
-func getExerciseHistoryAndHandleError(id int, ctx *gin.Context) (*data.ExerciseHistory, bool) {
-	e, err := db.GetExerciseHistory(id)
+func (c *Controller) getExerciseHistoryAndHandleError(id int, ctx *gin.Context) (*data.ExerciseHistory, bool) {
+	e, err := c.db.GetExerciseHistory(id)
 	if err != nil {
 		var notFoundErr *data.RecordNotFoundError
 		if errors.As(err, &notFoundErr) {
@@ -117,7 +117,7 @@ func getExerciseHistoryAndHandleError(id int, ctx *gin.Context) (*data.ExerciseH
 	return e, true
 }
 
-func createWorkout(ctx *gin.Context) {
+func (c *Controller) createWorkout(ctx *gin.Context) {
 	userID, err := strconv.Atoi(ctx.PostForm("userid"))
 	if err != nil {
 		ctx.AbortWithError(http.StatusBadRequest, err)
@@ -125,36 +125,36 @@ func createWorkout(ctx *gin.Context) {
 
 	w := data.NewWorkout(userID)
 	w.Name = ctx.PostForm("name")
-	saveWorkout(w)
+	c.saveWorkout(w)
 	ctx.Redirect(http.StatusFound, "/workouts")
 }
 
-func saveWorkout(w *data.Workout) {
-	err := db.SaveWorkout(w)
+func (c *Controller) saveWorkout(w *data.Workout) {
+	err := c.db.SaveWorkout(w)
 	if err != nil {
 		panic(err)
 	}
 }
 
-func deleteWorkout(ctx *gin.Context) {
+func (c *Controller) deleteWorkout(ctx *gin.Context) {
 	id, err := parseIDParam(ctx)
 	if err != nil {
 		ctx.Redirect(http.StatusFound, "/workouts")
 		return
 	}
 
-	w, ok := getWorkoutAndHandleErrors(id, ctx)
+	w, ok := c.getWorkoutAndHandleErrors(id, ctx)
 	if !ok {
 		return
 	}
 
-	err = db.DeleteWorkout(w)
+	err = c.db.DeleteWorkout(w)
 	if err != nil {
 		panic(err)
 	}
 }
 
-func addWorkoutExercise(ctx *gin.Context) {
+func (c *Controller) addWorkoutExercise(ctx *gin.Context) {
 	workoutId, err := parseIDParam(ctx)
 	if err != nil {
 		ctx.Redirect(http.StatusFound, "/workouts")
@@ -167,21 +167,21 @@ func addWorkoutExercise(ctx *gin.Context) {
 		return
 	}
 
-	w, ok := getWorkoutAndHandleErrors(workoutId, ctx)
+	w, ok := c.getWorkoutAndHandleErrors(workoutId, ctx)
 	if !ok {
 		return
 	}
 
 	w.ExerciseInstances = append(w.ExerciseInstances, *data.NewExerciseHistory(w.UserId, w.Id, exId))
 
-	if err = db.SaveWorkout(w); err != nil {
+	if err = c.db.SaveWorkout(w); err != nil {
 		panic(err)
 	}
 
 	ctx.Redirect(http.StatusFound, fmt.Sprintf("/workouts/%d", workoutId))
 }
 
-func addWorkoutSet(ctx *gin.Context) {
+func (c *Controller) addWorkoutSet(ctx *gin.Context) {
 	workoutId, err := parseIDParam(ctx)
 	if err != nil {
 		ctx.Redirect(http.StatusFound, "/workouts")
@@ -193,7 +193,7 @@ func addWorkoutSet(ctx *gin.Context) {
 		ctx.Redirect(http.StatusFound, fmt.Sprintf("/workouts/%d", workoutId))
 	}
 
-	ex, ok := getExerciseHistoryAndHandleError(exId, ctx)
+	ex, ok := c.getExerciseHistoryAndHandleError(exId, ctx)
 	if !ok {
 		return
 	}
@@ -207,14 +207,14 @@ func addWorkoutSet(ctx *gin.Context) {
 
 	ex.AddSet(data.NewExerciseSet(weight, reps))
 
-	if err = db.SaveExerciseHistory(ex); err != nil {
+	if err = c.db.SaveExerciseHistory(ex); err != nil {
 		panic(err)
 	}
 
 	ctx.Redirect(http.StatusFound, fmt.Sprintf("/workouts/%d", workoutId))
 }
 
-func updateWorkoutSet(ctx *gin.Context) {
+func (c *Controller) updateWorkoutSet(ctx *gin.Context) {
 	workoutId, err := parseIDParam(ctx)
 	if err != nil {
 		ctx.Redirect(http.StatusFound, "/workouts")
@@ -227,7 +227,7 @@ func updateWorkoutSet(ctx *gin.Context) {
 		return
 	}
 
-	set, ok := getSetAndHandleError(setId, ctx)
+	set, ok := c.getSetAndHandleError(setId, ctx)
 	if !ok {
 		return
 	}
@@ -242,14 +242,14 @@ func updateWorkoutSet(ctx *gin.Context) {
 	set.WeightKG = weight
 	set.Reps = reps
 
-	if err := db.SaveSet(set); err != nil {
+	if err := c.db.SaveSet(set); err != nil {
 		panic(err)
 	}
 
 	ctx.Redirect(http.StatusFound, fmt.Sprintf("/workouts/%d", workoutId))
 }
 
-func deleteWorkoutSet(ctx *gin.Context) {
+func (c *Controller) deleteWorkoutSet(ctx *gin.Context) {
 	workoutId, err := parseIDParam(ctx)
 	if err != nil {
 		ctx.Redirect(http.StatusFound, "/workouts")
@@ -262,19 +262,19 @@ func deleteWorkoutSet(ctx *gin.Context) {
 		return
 	}
 
-	set, ok := getSetAndHandleError(setId, ctx)
+	set, ok := c.getSetAndHandleError(setId, ctx)
 	if !ok {
 		return
 	}
 
-	if err := db.DeleteSet(set); err != nil {
+	if err := c.db.DeleteSet(set); err != nil {
 		panic(err)
 	}
 
 	ctx.Redirect(http.StatusFound, fmt.Sprintf("/workouts/%d", workoutId))
 }
 
-func deleteWorkoutExercise(ctx *gin.Context) {
+func (c *Controller) deleteWorkoutExercise(ctx *gin.Context) {
 	workoutId, err := parseIDParam(ctx)
 	if err != nil {
 		ctx.Redirect(http.StatusFound, "/workouts")
@@ -286,11 +286,11 @@ func deleteWorkoutExercise(ctx *gin.Context) {
 		ctx.Redirect(http.StatusFound, fmt.Sprintf("/workouts/%d", workoutId))
 	}
 
-	ex, ok := getExerciseHistoryAndHandleError(exId, ctx)
+	ex, ok := c.getExerciseHistoryAndHandleError(exId, ctx)
 	if !ok {
 		return
 	}
 
-	db.DeleteExerciseHistory(ex)
+	c.db.DeleteExerciseHistory(ex)
 	ctx.Redirect(http.StatusFound, fmt.Sprintf("/workouts/%d", workoutId))
 }

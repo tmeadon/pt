@@ -8,19 +8,19 @@ import (
 	"github.com/tmeadon/pt/pkg/data"
 )
 
-func loadUserRoutes(rg *gin.RouterGroup) {
-	g := rg.Group("/users")
+func (c *Controller) loadUserRoutes() {
+	g := c.baseRouterGroup.Group("/users")
 
-	g.GET("/", allUsers)
-	g.GET("/:id/edit", userEdit)
-	g.GET("/new", userNew)
-	g.POST("/", createUser)
-	g.POST("/:id", updateUser)
-	g.POST("/:id/delete", deleteUser)
+	g.GET("/", c.allUsers)
+	g.GET("/:id/edit", c.userEdit)
+	g.GET("/new", c.userNew)
+	g.POST("/", c.createUser)
+	g.POST("/:id", c.updateUser)
+	g.POST("/:id/delete", c.deleteUser)
 }
 
-func allUsers(ctx *gin.Context) {
-	users, err := db.GetAllUsers()
+func (c *Controller) allUsers(ctx *gin.Context) {
+	users, err := c.db.GetAllUsers()
 	if err != nil && !errors.Is(err, &data.RecordNotFoundError{}) {
 		panic(err)
 	}
@@ -33,14 +33,14 @@ func allUsers(ctx *gin.Context) {
 	)
 }
 
-func userEdit(ctx *gin.Context) {
+func (c *Controller) userEdit(ctx *gin.Context) {
 	id, err := parseIDParam(ctx)
 	if err != nil {
 		ctx.Redirect(http.StatusFound, "/users")
 		return
 	}
 
-	u, ok := getUserAndHandleErrors(id, ctx)
+	u, ok := c.getUserAndHandleErrors(id, ctx)
 	if !ok {
 		return
 	}
@@ -52,8 +52,8 @@ func userEdit(ctx *gin.Context) {
 	)
 }
 
-func getUserAndHandleErrors(id int, ctx *gin.Context) (*data.User, bool) {
-	u, err := db.GetUser(id)
+func (c *Controller) getUserAndHandleErrors(id int, ctx *gin.Context) (*data.User, bool) {
+	u, err := c.db.GetUser(id)
 	if err != nil {
 		var notFoundErr *data.RecordNotFoundError
 		if errors.As(err, &notFoundErr) {
@@ -65,7 +65,7 @@ func getUserAndHandleErrors(id int, ctx *gin.Context) (*data.User, bool) {
 	return u, true
 }
 
-func userNew(ctx *gin.Context) {
+func (c *Controller) userNew(ctx *gin.Context) {
 	u := &data.User{}
 	ctx.HTML(
 		http.StatusOK,
@@ -74,51 +74,51 @@ func userNew(ctx *gin.Context) {
 	)
 }
 
-func createUser(ctx *gin.Context) {
+func (c *Controller) createUser(ctx *gin.Context) {
 	u := data.NewUser()
 	u.Username = ctx.PostForm("username")
 	u.Name = ctx.PostForm("name")
-	saveUser(u)
+	c.saveUser(u)
 	ctx.Redirect(http.StatusFound, "/users")
 }
 
-func saveUser(u *data.User) {
-	err := db.SaveUser(u)
+func (c *Controller) saveUser(u *data.User) {
+	err := c.db.SaveUser(u)
 	if err != nil {
 		panic(err)
 	}
 }
 
-func updateUser(ctx *gin.Context) {
+func (c *Controller) updateUser(ctx *gin.Context) {
 	id, err := parseIDParam(ctx)
 	if err != nil {
 		ctx.Redirect(http.StatusFound, "/users")
 		return
 	}
 
-	u, ok := getUserAndHandleErrors(id, ctx)
+	u, ok := c.getUserAndHandleErrors(id, ctx)
 	if !ok {
 		return
 	}
 
 	u.Name = ctx.PostForm("name")
-	saveUser(u)
+	c.saveUser(u)
 	ctx.Redirect(http.StatusFound, "/users")
 }
 
-func deleteUser(ctx *gin.Context) {
+func (c *Controller) deleteUser(ctx *gin.Context) {
 	id, err := parseIDParam(ctx)
 	if err != nil {
 		ctx.Redirect(http.StatusFound, "/users")
 		return
 	}
 
-	u, ok := getUserAndHandleErrors(id, ctx)
+	u, ok := c.getUserAndHandleErrors(id, ctx)
 	if !ok {
 		return
 	}
 
-	err = db.DeleteUser(u)
+	err = c.db.DeleteUser(u)
 	if err != nil {
 		panic(err)
 	}

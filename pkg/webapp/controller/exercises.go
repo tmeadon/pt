@@ -10,20 +10,20 @@ import (
 	"github.com/tmeadon/pt/pkg/data"
 )
 
-func loadExerciseRoutes(rg *gin.RouterGroup) {
-	g := rg.Group("/exercises")
+func (c *Controller) loadExerciseRoutes() {
+	g := c.baseRouterGroup.Group("/exercises")
 
-	g.GET("/", allExercises)
-	g.GET("/:id", exercise)
-	g.GET("/:id/edit", exerciseEdit)
-	g.GET("/new", exerciseNew)
-	g.POST("/", createExercise)
-	g.POST("/:id", updateExercise)
-	g.POST("/:id/delete", deleteExercise)
+	g.GET("/", c.allExercises)
+	g.GET("/:id", c.exercise)
+	g.GET("/:id/edit", c.exerciseEdit)
+	g.GET("/new", c.exerciseNew)
+	g.POST("/", c.createExercise)
+	g.POST("/:id", c.updateExercise)
+	g.POST("/:id/delete", c.deleteExercise)
 }
 
-func allExercises(ctx *gin.Context) {
-	exercises, err := db.GetAllExercises()
+func (c *Controller) allExercises(ctx *gin.Context) {
+	exercises, err := c.db.GetAllExercises()
 	if err != nil && !errors.Is(err, &data.RecordNotFoundError{}) {
 		panic(err)
 	}
@@ -36,14 +36,14 @@ func allExercises(ctx *gin.Context) {
 	)
 }
 
-func exercise(ctx *gin.Context) {
+func (c *Controller) exercise(ctx *gin.Context) {
 	id, err := parseIDParam(ctx)
 	if err != nil {
 		redirectToExercises(ctx)
 		return
 	}
 
-	ex, ok := getExerciseAndHandleErrors(id, ctx)
+	ex, ok := c.getExerciseAndHandleErrors(id, ctx)
 	if !ok {
 		return
 	}
@@ -58,8 +58,8 @@ func exercise(ctx *gin.Context) {
 	)
 }
 
-func getExerciseAndHandleErrors(id int, ctx *gin.Context) (*data.Exercise, bool) {
-	ex, err := db.GetExercise(id)
+func (c *Controller) getExerciseAndHandleErrors(id int, ctx *gin.Context) (*data.Exercise, bool) {
+	ex, err := c.db.GetExercise(id)
 	if err != nil {
 		var notFoundErr *data.RecordNotFoundError
 		if errors.As(err, &notFoundErr) {
@@ -71,19 +71,19 @@ func getExerciseAndHandleErrors(id int, ctx *gin.Context) (*data.Exercise, bool)
 	return ex, true
 }
 
-func exerciseEdit(ctx *gin.Context) {
+func (c *Controller) exerciseEdit(ctx *gin.Context) {
 	id, err := parseIDParam(ctx)
 	if err != nil {
 		redirectToExercises(ctx)
 		return
 	}
 
-	ex, ok := getExerciseAndHandleErrors(id, ctx)
+	ex, ok := c.getExerciseAndHandleErrors(id, ctx)
 	if !ok {
 		return
 	}
 
-	viewData := getExerciseEditViewData(ex, ctx.Request.URL.Path)
+	viewData := c.getExerciseEditViewData(ex, ctx.Request.URL.Path)
 
 	ctx.HTML(
 		http.StatusOK,
@@ -100,18 +100,18 @@ type exerciseEditViewData struct {
 	RequestPath string
 }
 
-func getExerciseEditViewData(ex *data.Exercise, route string) exerciseEditViewData {
-	muscles, err := db.GetAllMuscles()
+func (c *Controller) getExerciseEditViewData(ex *data.Exercise, route string) exerciseEditViewData {
+	muscles, err := c.db.GetAllMuscles()
 	if err != nil && !errors.Is(err, &data.RecordNotFoundError{}) {
 		panic(err)
 	}
 
-	equipment, err := db.GetAllEquipment()
+	equipment, err := c.db.GetAllEquipment()
 	if err != nil && !errors.Is(err, &data.RecordNotFoundError{}) {
 		panic(err)
 	}
 
-	categories, err := db.GetAllCategories()
+	categories, err := c.db.GetAllCategories()
 	if err != nil && !errors.Is(err, &data.RecordNotFoundError{}) {
 		panic(err)
 	}
@@ -125,9 +125,9 @@ func getExerciseEditViewData(ex *data.Exercise, route string) exerciseEditViewDa
 	}
 }
 
-func exerciseNew(ctx *gin.Context) {
+func (c *Controller) exerciseNew(ctx *gin.Context) {
 	ex := &data.Exercise{}
-	viewData := getExerciseEditViewData(ex, ctx.Request.URL.Path)
+	viewData := c.getExerciseEditViewData(ex, ctx.Request.URL.Path)
 	ctx.HTML(
 		http.StatusOK,
 		"views/exercise_new.html",
@@ -139,20 +139,20 @@ func redirectToExercises(ctx *gin.Context) {
 	ctx.Redirect(http.StatusFound, "/exercises")
 }
 
-func updateExercise(ctx *gin.Context) {
+func (c *Controller) updateExercise(ctx *gin.Context) {
 	id, err := parseIDParam(ctx)
 	if err != nil {
 		redirectToExercises(ctx)
 		return
 	}
 
-	ex, ok := getExerciseAndHandleErrors(id, ctx)
+	ex, ok := c.getExerciseAndHandleErrors(id, ctx)
 	if !ok {
 		return
 	}
 
 	updateExerciseFromForm(ctx, ex)
-	saveExercise(ex)
+	c.saveExercise(ex)
 	ctx.Redirect(http.StatusFound, fmt.Sprintf("/exercises/%d", id))
 }
 
@@ -165,33 +165,33 @@ func updateExerciseFromForm(ctx *gin.Context, ex *data.Exercise) {
 	ex.SetCategory(ctx.PostForm("category"))
 }
 
-func saveExercise(ex *data.Exercise) {
-	err := db.SaveExercise(ex)
+func (c *Controller) saveExercise(ex *data.Exercise) {
+	err := c.db.SaveExercise(ex)
 	if err != nil {
 		panic(err)
 	}
 }
 
-func createExercise(ctx *gin.Context) {
+func (c *Controller) createExercise(ctx *gin.Context) {
 	ex := data.NewExercise()
 	updateExerciseFromForm(ctx, ex)
-	saveExercise(ex)
+	c.saveExercise(ex)
 	ctx.Redirect(http.StatusFound, fmt.Sprintf("/exercises/%d", ex.Id))
 }
 
-func deleteExercise(ctx *gin.Context) {
+func (c *Controller) deleteExercise(ctx *gin.Context) {
 	id, err := parseIDParam(ctx)
 	if err != nil {
 		redirectToExercises(ctx)
 		return
 	}
 
-	ex, ok := getExerciseAndHandleErrors(id, ctx)
+	ex, ok := c.getExerciseAndHandleErrors(id, ctx)
 	if !ok {
 		return
 	}
 
-	err = db.DeleteExercise(ex)
+	err = c.db.DeleteExercise(ex)
 	if err != nil {
 		panic(err)
 	}

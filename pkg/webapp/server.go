@@ -6,25 +6,34 @@ import (
 	"github.com/tmeadon/pt/pkg/webapp/controller"
 )
 
-var server *Server
-
 type Server struct {
-	db  *data.DB
-	gin *gin.Engine
+	db         *data.DB
+	gin        *gin.Engine
+	controller *controller.Controller
 }
 
 func NewServer(dbPath string) *Server {
-	server = &Server{
-		db:  data.InitDatabase(dbPath),
-		gin: gin.New(),
+	db := data.InitDatabase(dbPath)
+	g := initGin()
+	c := controller.NewController(db, g.Group("/"))
+
+	return &Server{
+		db:         data.InitDatabase(dbPath),
+		gin:        g,
+		controller: c,
 	}
-	return server
+}
+
+func initGin() (g *gin.Engine) {
+	g = gin.New()
+	g.Use(gin.Logger())
+	g.Use(gin.Recovery())
+	return
 }
 
 func (s *Server) Start() error {
 	s.gin.Use(gin.Logger())
 	s.gin.Use(gin.Recovery())
-	controller.LoadRoutes(s.db, s.gin.Group("/"))
 
 	s.gin.SetFuncMap(controller.TemplateFuncs())
 
