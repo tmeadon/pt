@@ -41,6 +41,8 @@ jobs:
     needs: ci
     steps: 
 
+      - uses: actions/checkout@v1
+
       - name: Azure login
         uses: Azure/login@v1
         with:
