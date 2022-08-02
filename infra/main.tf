@@ -10,10 +10,15 @@ terraform {
     azapi = {
       source = "Azure/azapi"
     }
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "=3.7.0"
+    }
   }
 }
 
 provider "azurerm" {
+  use_oidc = true
   features {}
 }
 
@@ -129,7 +134,7 @@ resource "azapi_resource" "container_app" {
             value = azurerm_container_registry.acr.admin_password
           },
           {
-            name = "backup-sas"
+            name  = "backup-sas"
             value = "${azurerm_storage_account.stg.primary_blob_endpoint}${azurerm_storage_container.db_backups.name}/${data.azurerm_storage_account_blob_container_sas.backup_sas.sas}"
           }
         ]
@@ -139,12 +144,12 @@ resource "azapi_resource" "container_app" {
           image = "${var.pt_web_image}"
           name  = "ptweb"
           env = [{
-            name = "PT_BACKUP_SAS"
+            name      = "PT_BACKUP_SAS"
             secretRef = "backup-sas"
           }]
           resources = {
-            cpu: 0.25
-            memory: "0.5Gi"
+            cpu : 0.25
+            memory : "0.5Gi"
           }
         }]
         scale = {
