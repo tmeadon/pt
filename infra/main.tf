@@ -20,7 +20,7 @@ provider "azurerm" {
 provider "azapi" {
 }
 
-variable "pt_web_version" {
+variable "pt_web_image" {
   type = string
 }
 
@@ -136,7 +136,7 @@ resource "azapi_resource" "container_app" {
       }
       template = {
         containers = [{
-          image = "${azurerm_container_registry.acr.login_server}/pt:${var.pt_web_version}"
+          image = "${var.pt_web_image}"
           name  = "ptweb"
           env = [{
             name = "PT_BACKUP_SAS"

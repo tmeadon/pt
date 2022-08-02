@@ -1,0 +1,63 @@
+name: cicd
+
+on:
+  push:
+    branches:
+      - 'main'
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  IMAGE_BASE_NAME: ptweb
+  IMAGE_BASE_VERSION: 0.0.1
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+        
+      - name: Docker login
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ secrets.ACR_LOGIN_SERVER }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+      
+      - name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          push: true
+          tags: ${{ secrets.ACR_LOGIN_SERVER }}/${{ env.IMAGE_BASE_NAME }}:${{ env.IMAGE_BASE_VERSION }}_${{ github.run_number }}
+
+  cd: 
+    runs-on: ubuntu-latest
+    steps: 
+
+      - name: Azure login
+        uses: Azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Terraform setup
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.2.6
+
+      - name: Terraform init
+        working-directory: ./infra
+        run: terraform init 
+
+      - name: Terraform apply
+        working-directory: ./infra
+        run: terraform apply -auto-approve -var pt_web_image=${{ secrets.ACR_LOGIN_SERVER }}/${{ env.IMAGE_BASE_NAME }}:${{ env.IMAGE_BASE_VERSION }}_${{ github.run_number }}
+
+      
+      
+    
