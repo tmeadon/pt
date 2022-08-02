@@ -20,6 +20,10 @@ provider "azurerm" {
 provider "azapi" {
 }
 
+variable "pt_web_version" {
+  type = string
+}
+
 resource "azurerm_resource_group" "rg" {
   name     = "pt"
   location = "uksouth"
@@ -132,12 +136,16 @@ resource "azapi_resource" "container_app" {
       }
       template = {
         containers = [{
-          image = "${azurerm_container_registry.acr.login_server}/pt:latest"
+          image = "${azurerm_container_registry.acr.login_server}/pt:${var.pt_web_version}"
           name  = "ptweb"
           env = [{
             name = "PT_BACKUP_SAS"
             secretRef = "backup-sas"
           }]
+          resources = {
+            cpu: 0.25
+            memory: "0.5Gi"
+          }
         }]
         scale = {
           minReplicas = 1
