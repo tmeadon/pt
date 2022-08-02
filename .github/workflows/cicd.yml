@@ -17,9 +17,6 @@ jobs:
   ci:
     runs-on: ubuntu-latest
     steps:
-      
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
         
       - name: Docker login
         uses: azure/docker-login@v1
@@ -27,6 +24,9 @@ jobs:
           login-server: ${{ secrets.ACR_LOGIN_SERVER }}
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
       
       - name: Build and push
         uses: docker/build-push-action@v3
