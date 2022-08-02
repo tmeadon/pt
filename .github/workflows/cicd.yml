@@ -54,9 +54,9 @@ jobs:
           terraform_version: 1.2.6
 
       - name: Terraform init
-        working-directory: ./infra
+        working-directory: infra
         run: terraform init 
 
       - name: Terraform apply
-        working-directory: ./infra
+        working-directory: infra
         run: terraform apply -auto-approve -var pt_web_image=${{ secrets.ACR_LOGIN_SERVER }}/${{ env.IMAGE_BASE_NAME }}:${{ env.IMAGE_BASE_VERSION }}_${{ github.run_number }}
