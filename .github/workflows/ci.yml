@@ -12,6 +12,7 @@ permissions:
 env:
   IMAGE_BASE_NAME: ptweb
   IMAGE_BASE_VERSION: 0.0.1
+  IMAGE_TAG: ${{ secrets.ACR_LOGIN_SERVER }}/${{ env.IMAGE_BASE_NAME }}:${{ env.IMAGE_BASE_VERSION }}_${{ github.run_number }}
 
 jobs:
   ci:
@@ -39,4 +40,4 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           push: true
-          tags: ${{ secrets.ACR_LOGIN_SERVER }}/${{ env.IMAGE_BASE_NAME }}:${{ env.IMAGE_BASE_VERSION }}_${{ github.run_number }}
+          tags: ${{ env.IMAGE_TAG }}
