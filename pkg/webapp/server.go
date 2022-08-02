@@ -28,6 +28,7 @@ func initGin() (g *gin.Engine) {
 	g = gin.New()
 	g.Use(gin.Logger())
 	g.Use(gin.Recovery())
+	g.SetTrustedProxies(nil)
 	return
 }
 

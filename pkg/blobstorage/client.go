@@ -3,6 +3,7 @@ package blobstorage
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"path"
 	"strings"
@@ -55,7 +56,7 @@ func (c *BackupContainer) Upload(srcPath string) error {
 		return err
 	}
 
-	fmt.Printf("Uploaded %s to %s\n", srcPath, strings.Split(c.container.URL(), "?")[0])
+	log.Printf("Uploaded %s to %s\n", srcPath, strings.Split(c.container.URL(), "?")[0])
 	return nil
 }
 

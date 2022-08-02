@@ -3,6 +3,8 @@ package main
 import (
 	"log"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/tmeadon/pt/pkg/backupmgr"
@@ -16,10 +18,17 @@ var backupContainer *blobstorage.BackupContainer
 func main() {
 	getBackupContainer()
 	restoreDbIfNeeded()
-	go backupRoutine()
+	sigs := registerSigListeners()
+	done := make(chan bool)
+	go backupRoutine(sigs, done)
 
-	s := webapp.NewServer(dbPath)
-	s.Start()
+	go func() {
+		s := webapp.NewServer(dbPath)
+		s.Start()
+	}()
+
+	<-done
+	log.Printf("exiting")
 }
 
 func restoreDbIfNeeded() {
@@ -41,6 +50,12 @@ func restoreNeeded() bool {
 	return true
 }
 
+func registerSigListeners() chan os.Signal {
+	ch := make(chan os.Signal, 1)
+	signal.Notify(ch, syscall.SIGTERM, syscall.SIGINT)
+	return ch
+}
+
 func getBackupContainer() {
 	sas, ok := os.LookupEnv("PT_BACKUP_SAS")
 	if !ok {
@@ -55,16 +70,26 @@ func getBackupContainer() {
 	backupContainer = container
 }
 
-func backupRoutine() {
+func backupRoutine(sig chan os.Signal, done chan bool) {
 	for {
-		time.Sleep(8 * time.Hour)
-
-		err := backupmgr.BackupAndShip(dbPath, backupContainer)
-
-		if err != nil {
-			log.Printf("failed to execute database backup: %v", err)
-		} else {
-			log.Printf("backup completed")
+		select {
+		case <-time.After(8 * time.Hour):
+			log.Printf("backup timer elapsed")
+			backup()
+		case <-sig:
+			log.Printf("backup signal received")
+			backup()
+			done <- true
 		}
+	}
+}
+
+func backup() {
+	err := backupmgr.BackupAndShip(dbPath, backupContainer)
+
+	if err != nil {
+		log.Printf("failed to execute database backup: %v", err)
+	} else {
+		log.Printf("backup completed")
 	}
 }

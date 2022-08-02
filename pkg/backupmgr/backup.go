@@ -14,7 +14,7 @@ type backupContainer interface {
 
 func createBackup(dbPath string) (string, error) {
 	dstPath := dbPath + "-" + time.Now().Format("2006-01-02T15:04:05-0700")
-	cmd := exec.Command("bash", "-c", fmt.Sprintf("sqlite3 %s '.backup %s'", dbPath, dstPath))
+	cmd := exec.Command("sh", "-c", fmt.Sprintf("sqlite3 %s '.backup %s'", dbPath, dstPath))
 	err := cmd.Run()
 
 	if err != nil {
