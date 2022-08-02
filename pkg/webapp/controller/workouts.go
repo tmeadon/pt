@@ -198,14 +198,14 @@ func (c *Controller) addWorkoutSet(ctx *gin.Context) {
 		return
 	}
 
-	weight, weightErr := strconv.Atoi(ctx.PostForm("weight"))
+	weight, weightErr := strconv.ParseFloat(ctx.PostForm("weight"), 32)
 	reps, repsErr := strconv.Atoi(ctx.PostForm("reps"))
 
 	if weightErr != nil || repsErr != nil {
 		ctx.Redirect(http.StatusFound, fmt.Sprintf("/workouts/%d", workoutId))
 	}
 
-	ex.AddSet(data.NewExerciseSet(weight, reps))
+	ex.AddSet(data.NewExerciseSet(float32(weight), reps))
 
 	if err = c.db.SaveExerciseHistory(ex); err != nil {
 		panic(err)
@@ -232,14 +232,14 @@ func (c *Controller) updateWorkoutSet(ctx *gin.Context) {
 		return
 	}
 
-	weight, weightErr := strconv.Atoi(ctx.PostForm("weight"))
+	weight, weightErr := strconv.ParseFloat(ctx.PostForm("weight"), 32)
 	reps, repsErr := strconv.Atoi(ctx.PostForm("reps"))
 
 	if weightErr != nil || repsErr != nil {
 		ctx.Redirect(http.StatusFound, fmt.Sprintf("/workouts/%d", workoutId))
 	}
 
-	set.WeightKG = weight
+	set.WeightKG = float32(weight)
 	set.Reps = reps
 
 	if err := c.db.SaveSet(set); err != nil {

@@ -6,12 +6,12 @@ import (
 
 type ExerciseSet struct {
 	Base
-	WeightKG          int `json:"weight_kg"`
-	Reps              int `json:"reps"`
-	ExerciseHistoryId int `json:"-"`
+	WeightKG          float32 `json:"weight_kg"`
+	Reps              int     `json:"reps"`
+	ExerciseHistoryId int     `json:"-"`
 }
 
-func NewExerciseSet(weightKg int, reps int) *ExerciseSet {
+func NewExerciseSet(weightKg float32, reps int) *ExerciseSet {
 	now := time.Now().UTC()
 	return &ExerciseSet{
 		Base: Base{
