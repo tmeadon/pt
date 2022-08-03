@@ -23,7 +23,6 @@
   data-page-size="30">
     <thead>
       <tr>
-        <th data-visible="false">ID</th>
         <th data-sortable="true">Name</th>
         <th data-sortable="true">Category</th>
         <th data-sortable="true">Muscles</th>
@@ -32,8 +31,7 @@
     </thead>
     <tbody>
       {{ range .Exercises }}
-        <tr>
-          <td>{{ .Id }}</td>
+        <tr id="row-exercise-{{ .Id }}">
           <td>{{ .Name }}</td>
           <td>{{ .Category.Name }}</td>
           <td>
@@ -52,7 +50,8 @@
   
   $(function () {
     $table.on('click-row.bs.table', function (e, row, $element) {
-      window.location.href = "/exercises/" + row[0]
+      let exerciseId = $element[0].id.split("-")[2]
+      window.location.href = "/exercises/" + exerciseId
     })
   })
 </script>
