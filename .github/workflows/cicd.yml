@@ -62,4 +62,4 @@ jobs:
 
       - name: Terraform apply
         working-directory: infra
-        run: terraform apply -auto-approve -var pt_web_image=${{ secrets.ACR_LOGIN_SERVER }}/${{ env.IMAGE_BASE_NAME }}:${{ env.IMAGE_BASE_VERSION }}_${{ github.run_number }}
+        run: terraform apply -auto-approve -lock-timeout=5m -var pt_web_image=${{ secrets.ACR_LOGIN_SERVER }}/${{ env.IMAGE_BASE_NAME }}:${{ env.IMAGE_BASE_VERSION }}_${{ github.run_number }}
