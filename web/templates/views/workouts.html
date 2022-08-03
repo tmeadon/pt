@@ -23,7 +23,6 @@
   data-page-size="30">
     <thead>
       <tr>
-        <th data-sortable="true">Name</th>
         <th data-sortable="true">Created</th>
         <th data-sortable="true">User</th>
         <th data-sortable="true">Exercise Categories</th>
@@ -32,7 +31,6 @@
     <tbody>
       {{ range .Workouts }}
         <tr id="row-workout-{{ .Id }}">
-          <td>{{ .Name }}</td>
           <td>{{ .Created | FormatWorkoutDate }}</td>
           <td>{{ .User.Name }}</td>
           <td>
@@ -55,10 +53,6 @@
       </div>
       <form action="/workouts" method="post">
         <div class="modal-body">
-          <div class="mb-3">
-            <label for="name" class="form-label">Name</label>
-            <input name="name" placeholder="Name" class="form-control" type="text">
-          </div>
           <div class="mb-3">
             <label for="userSelect" class="form-label">User</label>
             <select name="userid" class="form-control" id="userSelect">

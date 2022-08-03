@@ -8,15 +8,12 @@
     <ol class="breadcrumb">
       <li class="breadcrumb-item"><a href="/">Home</a></li>
       <li class="breadcrumb-item"><a href="/workouts">Workouts</a></li>
-      <li class="breadcrumb-item active">{{ .Workout.Name }}</li>
+      <li class="breadcrumb-item active">{{ .Workout.Created | FormatWorkoutDate }}</li>
     </ol>
 </nav>
 
 <h1>
-    {{ .Workout.Name }}
-    <small class="text-muted">
-        {{ .Workout.Created | FormatWorkoutDate }}
-    </small>
+    {{ .Workout.Created | FormatWorkoutDate }}
 </h1>
 
 <div class="mb-5 mt-3">
@@ -123,7 +120,7 @@
 
 <script>
     function deleteWorkout() {
-        if (confirm("Are you sure you want to delete {{ .Workout.Name }}?") == true) {
+        if (confirm("Are you sure you want to delete workout?") == true) {
             fetch("/workouts/{{ .Workout.Id }}/delete", { method: "POST" })
             window.location.href = "/workouts/"
         }
