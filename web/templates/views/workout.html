@@ -14,8 +14,8 @@
 
 <h1>
     {{ .Workout.Name }}
-    <small class="text-muted" id="createdTime">
-        <!-- set by js -->
+    <small class="text-muted">
+        {{ .Workout.Created | FormatWorkoutDate }}
     </small>
 </h1>
 
@@ -156,8 +156,6 @@
         formDiv.hidden = !formDiv.hidden
         button.hidden = !button.hidden
     }
-
-    document.getElementById("createdTime").innerHTML = formatCreatedDate("{{ .Workout.Created }}")
 
     function addSetButtonClicked(exerciseInstanceId) {
         let formDiv = document.getElementById(`exercise-${exerciseInstanceId}-add-set`)

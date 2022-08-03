@@ -35,7 +35,7 @@
         <tr>
           <td>{{ .Id }}</td>
           <td>{{ .Name }}</td>
-          <td id="createdTime{{ .Id }}"> <!-- set by setCreatedTime() --></td>
+          <td>{{ .Created | FormatWorkoutDate }}</td>
           <td>{{ .User.Name }}</td>
           <td>
             {{ JoinCategoryNames .ExerciseCategories }}
@@ -87,13 +87,6 @@
     })
   })
 
-  function setCreatedTime(id, created) {
-    document.getElementById(`createdTime${id}`).innerHTML = formatCreatedDate(created)
-  }
-
-  {{ range .Workouts }}
-    setCreatedTime("{{ .Id }}", "{{ .Created }}")
-  {{ end }}
 </script>
 
 {{ template "layouts/footer.html" . }}

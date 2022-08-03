@@ -3,6 +3,7 @@ package controller
 import (
 	"html/template"
 	"strings"
+	"time"
 
 	"github.com/tmeadon/pt/pkg/data"
 )
@@ -16,6 +17,7 @@ func TemplateFuncs() template.FuncMap {
 		"JoinMuscleNames":             joinMuscleNames,
 		"JoinEquipmentNames":          joinEquipmentNames,
 		"JoinCategoryNames":           joinCategoryNames,
+		"FormatWorkoutDate":           formatWorkoutDate,
 	}
 }
 
@@ -76,4 +78,8 @@ func joinCategoryNames(categories []data.ExerciseCategory) string {
 		names = append(names, e.Name)
 	}
 	return strings.Join(names, ", ")
+}
+
+func formatWorkoutDate(d time.Time) string {
+	return d.Format("Monday, 1 January 2006 at 15:04")
 }
