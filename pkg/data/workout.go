@@ -6,7 +6,6 @@ import (
 
 type Workout struct {
 	Base
-	Name               string             `json:"name"`
 	UserId             int                `json:"user_id"`
 	User               User               `json:"user"`
 	ExerciseInstances  []ExerciseHistory  `json:"exercises"`

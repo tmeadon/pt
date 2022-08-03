@@ -124,7 +124,6 @@ func (c *Controller) createWorkout(ctx *gin.Context) {
 	}
 
 	w := data.NewWorkout(userID)
-	w.Name = ctx.PostForm("name")
 	c.saveWorkout(w)
 	ctx.Redirect(http.StatusFound, "/workouts")
 }
